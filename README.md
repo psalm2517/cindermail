@@ -90,7 +90,7 @@ This project was built with AI assistance, directed by me.
 
 ## License
 
-Unlicense (public domain). See [LICENSE](./LICENSE).
+Unlicense. See [LICENSE](./LICENSE).
 
 <div align="center">
 
