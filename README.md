@@ -86,7 +86,11 @@ Code layout and tests: [docs/architecture.md](docs/architecture.md). Every setti
 
 ## License
 
-MIT. See [LICENSE](./LICENSE).
+MIT.
+
+## AI disclosure
+
+This project was built with AI assistance, directed by me.
 
 <div align="center">
 
