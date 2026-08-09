@@ -81,6 +81,7 @@ Code layout and tests: [docs/architecture.md](docs/architecture.md). Every setti
 ## Under consideration (contingent on demand)
 
 - Telegram delivery adapter
+- Slack delivery adapter
 - Publicly hosted instance
 
 ## License
