@@ -25,7 +25,7 @@ One Worker, one D1 database, two modes:
 ## 1. Clone and install
 
 ```bash
-git clone https://github.com/Psalm2517/Cindermail.git
+git clone https://github.com/psalm2517/cindermail.git
 cd Cindermail
 npm install
 ```

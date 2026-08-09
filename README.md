@@ -4,12 +4,12 @@
 
 **Disposable email delivered where you already are.**
 
-[![Release](https://img.shields.io/github/v/release/Psalm2517/Cindermail)](https://github.com/Psalm2517/Cindermail/releases)
+[![Release](https://img.shields.io/github/v/release/psalm2517/cindermail)](https://github.com/psalm2517/cindermail/releases)
 [![License: Unlicense](https://img.shields.io/badge/License-Unlicense-blue.svg)](./LICENSE)
-[![CI](https://github.com/Psalm2517/Cindermail/actions/workflows/ci.yml/badge.svg)](https://github.com/Psalm2517/Cindermail/actions/workflows/ci.yml)
+[![CI](https://github.com/psalm2517/cindermail/actions/workflows/ci.yml/badge.svg)](https://github.com/psalm2517/cindermail/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-f38020.svg?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com)
-[![Stars](https://img.shields.io/github/stars/Psalm2517/Cindermail)](https://github.com/Psalm2517/Cindermail/stargazers)
+[![Stars](https://img.shields.io/github/stars/psalm2517/cindermail)](https://github.com/psalm2517/cindermail/stargazers)
 
 
 </div>
@@ -26,7 +26,7 @@ No domain? Leave one setting blank and it uses mail.tm's instead.
 
 ## Deploy
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Psalm2517/Cindermail)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/psalm2517/cindermail)
 
 Forks the repo, creates the database, deploys the Worker, prompts for your domain and Discord credentials. Blank domain means mail.tm mode.
 
@@ -36,7 +36,7 @@ It can't load the database schema or register the slash commands with Discord. T
 <summary>Prefer a local clone</summary>
 
 ```bash
-git clone https://github.com/Psalm2517/Cindermail.git
+git clone https://github.com/psalm2517/cindermail.git
 cd Cindermail
 npm install && npm run setup
 ```
