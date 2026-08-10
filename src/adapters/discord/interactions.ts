@@ -168,7 +168,7 @@ export async function handleInteraction(
         getOption(interaction, "note")
       );
     case "list":
-      return handleList(db, owner);
+      return handleList(db, owner, config);
     case "note":
       return handleNote(db, owner, getAddressOption(interaction), getOption(interaction, "note") ?? "");
     case "extend":
@@ -209,7 +209,7 @@ async function handleNew(
   const activeCount = await countActiveAddresses(db, owner);
   if (activeCount >= config.maxActiveAddresses) {
     return ephemeralReply(
-      `You already have ${config.maxActiveAddresses} active addresses. Torch one before creating another.`
+      `You already have ${activeCount}/${config.maxActiveAddresses} active addresses. Torch one before creating another.`
     );
   }
 
@@ -233,10 +233,11 @@ async function handleNote(db: SqlExecutor, owner: OwnerRef, address: string | un
     : ephemeralReply(`Cleared the note on \`${address}\`.`);
 }
 
-async function handleList(db: SqlExecutor, owner: OwnerRef) {
+async function handleList(db: SqlExecutor, owner: OwnerRef, config: CommandConfig) {
   const addresses = await listActiveAddresses(db, owner);
+  const quota = `${addresses.length}/${config.maxActiveAddresses} active addresses`;
   if (addresses.length === 0) {
-    return ephemeralReply("You have no active addresses.");
+    return ephemeralReply(`${quota}.`);
   }
   const lines = addresses.map((a) => {
     const when = a.permanent === 1 ? "permanent" : `expires <t:${a.expires_at}:R>`;
@@ -245,7 +246,7 @@ async function handleList(db: SqlExecutor, owner: OwnerRef) {
     const label = a.note ? ` ${a.note.replaceAll("`", "")} ` : " ";
     return `\`${a.address}\`${label}(${when})`;
   });
-  return ephemeralReply(lines.join("\n"));
+  return ephemeralReply([`${quota}:`, ...lines].join("\n"));
 }
 
 async function handleExtend(

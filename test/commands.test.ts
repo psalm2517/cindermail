@@ -178,6 +178,29 @@ test("notes", async (t) => {
     await createAddress(db, owner("n"), "ex.com", DAY, true, null);
     assert.match(replyText(await run(db, "n", "list")), /\(permanent\)/);
   });
+
+  await t.test("/list shows a quota line even with no active addresses", async () => {
+    const { db } = testDb();
+    assert.equal(replyText(await run(db, "n", "list")), `0/${config.maxActiveAddresses} active addresses.`);
+  });
+
+  await t.test("/list's quota line reflects how many are actually active", async () => {
+    const { db } = testDb();
+    await createAddress(db, owner("n"), "ex.com", DAY, false, null);
+    await createAddress(db, owner("n"), "ex.com", DAY, false, null);
+    assert.match(replyText(await run(db, "n", "list")), new RegExp(`^2/${config.maxActiveAddresses} active addresses:`));
+  });
+
+  await t.test("/new's refusal at the cap reports current/max, not just max", async () => {
+    const { db } = testDb();
+    for (let i = 0; i < config.maxActiveAddresses; i++) {
+      await createAddress(db, owner("n"), "ex.com", DAY, false, null);
+    }
+    assert.match(
+      replyText(await run(db, "n", "new")),
+      new RegExp(`${config.maxActiveAddresses}/${config.maxActiveAddresses} active addresses`)
+    );
+  });
 });
 
 test("unknown commands are rejected", async () => {

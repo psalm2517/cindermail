@@ -50,7 +50,7 @@ The wizard asks the same questions and writes the same config. Use this if you'l
 | | |
 |---|---|
 | `/new [expiry] [note]` | A fresh address. Permanent unless given an expiry in days. |
-| `/list` | Your addresses, with notes and expiry. |
+| `/list` | Your addresses, with notes, expiry, and how many of your quota you're using. |
 | `/extend <address> [expiry]` | Change when one expires. `expiry: 0` makes it permanent. |
 | `/note <address> [note]` | Label one. Blank clears it. |
 | `/remind [enabled]` | Opt in to a DM a day before an address expires. |

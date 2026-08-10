@@ -1,6 +1,6 @@
 {
   "name": "cinderbox",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Disposable email addresses on your own domain, delivered to Discord. Runs on Cloudflare Workers with Email Routing and D1, or on mail.tm with no domain at all.",
   "license": "Unlicense",
   "type": "module",
