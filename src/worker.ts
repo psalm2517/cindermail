@@ -1,6 +1,7 @@
 import { verifyKey } from "discord-interactions";
 import { createDiscordAdapter } from "./adapters/discord/index.ts";
-import { buildCommandConfig } from "./adapters/discord/config.ts";
+import { createTelegramAdapter } from "./adapters/telegram/index.ts";
+import { buildCommandConfig } from "./core/config.ts";
 import { handleInteraction, type DiscordInteraction } from "./adapters/discord/interactions.ts";
 import { createAddress, deleteExpiredAndRevoked, deleteStaleRateLimits, getCounters } from "./core/db.ts";
 import { createDispatcher } from "./core/dispatch.ts";
@@ -34,7 +35,11 @@ export interface Env {
   DISCORD_TOKEN: string;
   DISCORD_PUBLIC_KEY: string;
   DISCORD_APPLICATION_ID: string;
-  // Optional overrides for adapters/discord/config.ts defaults, see
+  // Only needed if ADAPTERS includes "telegram" -- this Worker never
+  // receives Telegram's webhook (src/telegram-worker.ts does), it just
+  // needs the token to deliver outbound mail/reminders to Telegram users.
+  TELEGRAM_BOT_TOKEN?: string;
+  // Optional overrides for core/config.ts defaults, see
   // docs/configuration.md for the full list of accepted vars.
   [key: string]: unknown;
 }
@@ -55,6 +60,9 @@ function buildAdapters(env: Env): MailAdapter[] {
   const adapters: MailAdapter[] = [];
   if (enabled.includes("discord")) {
     adapters.push(createDiscordAdapter(env.DISCORD_TOKEN));
+  }
+  if (enabled.includes("telegram") && env.TELEGRAM_BOT_TOKEN) {
+    adapters.push(createTelegramAdapter(env.TELEGRAM_BOT_TOKEN));
   }
   return adapters;
 }

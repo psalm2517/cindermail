@@ -10,35 +10,22 @@ import {
 import { checkAndIncrement } from "../../core/ratelimit.ts";
 import type { SqlExecutor } from "../../core/storage.ts";
 import type { OwnerRef } from "../../core/types.ts";
-import type { CommandConfig } from "./config.ts";
+import type { CommandConfig } from "../../core/config.ts";
+import {
+  BAD_EXPIRY_MESSAGE,
+  type CreateAddressFn,
+  describeExpiry,
+  MAX_EXPIRY_DAYS,
+  MAX_NOTE_LENGTH,
+  parseExpiry,
+} from "../../core/commands.ts";
+
+export type { CreateAddressFn } from "../../core/commands.ts";
+export { MAX_EXPIRY_DAYS, MAX_NOTE_LENGTH } from "../../core/commands.ts";
 
 const EPHEMERAL = 64;
 
 const RATE_LIMIT_MESSAGE = "Slow down a moment, then try again.";
-
-// How a new address actually gets created differs by mode: a domain you own
-// means inventing a random local part, mail.tm means calling their API and
-// getting an address back. Injecting this keeps command handling identical
-// across both instead of each needing its own copy of /new, /list, /extend,
-// /torch.
-export type CreateAddressFn = (
-  db: SqlExecutor,
-  owner: OwnerRef,
-  ttlSeconds: number,
-  permanent: boolean,
-  note: string | null
-) => Promise<string>;
-
-// Also applied by Discord itself via max_length/max_value on the registered
-// commands (register-commands.ts imports these), so out-of-range input is
-// normally rejected in its UI before reaching the Worker. Enforced here too
-// for anything that arrives another way.
-//
-// A note is long enough to be a useful label, short enough that /list stays
-// scannable. Past MAX_EXPIRY_DAYS an expiry stops being a meaningful date,
-// and anyone wanting longer wants a permanent address anyway.
-export const MAX_NOTE_LENGTH = 80;
-export const MAX_EXPIRY_DAYS = 3650;
 
 interface DiscordInteractionOption {
   name: string;
@@ -95,39 +82,6 @@ function getBooleanOption(interaction: DiscordInteraction, name: string): boolea
   const value = interaction.data?.options?.find((o) => o.name === name)?.value;
   return typeof value === "boolean" ? value : undefined;
 }
-
-interface Expiry {
-  ttlSeconds: number;
-  permanent: boolean;
-}
-
-// `expiry` is in days, 0 meaning permanent. Discord enforces the
-// 0..MAX_EXPIRY_DAYS range itself via min_value/max_value on the registered
-// command, so this is a backstop for anything reaching the endpoint another
-// way.
-//
-// Permanent still carries the default TTL rather than 0: core/db.ts keeps
-// expires_at fresh even on permanent rows deliberately, so that dropping the
-// flag later leaves a usable expiry instead of one that lapsed while the
-// address was permanent.
-function parseExpiry(days: number, defaultTtlSeconds: number): Expiry | null {
-  if (days < 0 || days > MAX_EXPIRY_DAYS) {
-    return null;
-  }
-  return days === 0
-    ? { ttlSeconds: defaultTtlSeconds, permanent: true }
-    : { ttlSeconds: days * 86400, permanent: false };
-}
-
-function describeExpiry(expiry: Expiry): string {
-  if (expiry.permanent) {
-    return "Permanent, good until you torch it.";
-  }
-  const days = Math.round(expiry.ttlSeconds / 86400);
-  return `Expires in ${days} day${days === 1 ? "" : "s"}.`;
-}
-
-const BAD_EXPIRY_MESSAGE = `\`expiry\` must be a whole number of days between 0 and ${MAX_EXPIRY_DAYS}. Use 0 for permanent.`;
 
 export async function handleInteraction(
   interaction: DiscordInteraction,

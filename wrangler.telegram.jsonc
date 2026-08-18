@@ -1,0 +1,29 @@
+{
+  // A separate Worker from wrangler.jsonc's cinderbox, deployed independently
+  // with `wrangler deploy --config wrangler.telegram.jsonc`. Owns only the
+  // Telegram webhook -- see src/telegram-worker.ts for why this isn't folded
+  // into the main Worker. Shares the same D1 database (same database_id
+  // below), so both Workers see the same address rows.
+  //
+  // No "triggers" here on purpose: cron (cleanup + the mail.tm poll) stays
+  // solely on cinderbox. Declaring crons here too would run the mail.tm
+  // poller twice, independently racing to claim the same messages.
+  "name": "cinderbox-telegram",
+  "main": "src/telegram-worker.ts",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "cinderbox",
+      "database_id": "80611409-6ad6-4226-a988-238e3d2e01fa"
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true
+    }
+  }
+}

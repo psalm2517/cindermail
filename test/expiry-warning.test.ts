@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildCommandConfig } from "../src/adapters/discord/config.ts";
+import { buildCommandConfig } from "../src/core/config.ts";
 import { handleInteraction } from "../src/adapters/discord/interactions.ts";
 import { createAddress, revokeAddress, setExpiryReminderPreference } from "../src/core/db.ts";
 import { createDispatcher } from "../src/core/dispatch.ts";

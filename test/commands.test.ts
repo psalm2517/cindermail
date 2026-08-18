@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildCommandConfig } from "../src/adapters/discord/config.ts";
+import { buildCommandConfig } from "../src/core/config.ts";
 import { handleInteraction } from "../src/adapters/discord/interactions.ts";
 import { createAddress, getAddress } from "../src/core/db.ts";
 import type { SqlExecutor } from "../src/core/storage.ts";
