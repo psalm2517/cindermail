@@ -3,7 +3,7 @@ import { createDiscordAdapter } from "./adapters/discord/index.ts";
 import { createTelegramAdapter } from "./adapters/telegram/index.ts";
 import { buildCommandConfig } from "./core/config.ts";
 import { handleInteraction, type DiscordInteraction } from "./adapters/discord/interactions.ts";
-import { createAddress, deleteExpiredAndRevoked, deleteStaleRateLimits, getCounters } from "./core/db.ts";
+import { createAddress, getCounters } from "./core/db.ts";
 import { createDispatcher } from "./core/dispatch.ts";
 import { handleInboundEmail } from "./core/email.ts";
 import { sendExpiryWarnings } from "./core/expiry-warning.ts";
@@ -43,9 +43,6 @@ export interface Env {
   // docs/configuration.md for the full list of accepted vars.
   [key: string]: unknown;
 }
-
-const CLEANUP_GRACE_SECONDS = 24 * 60 * 60;
-const STALE_RATE_LIMIT_SECONDS = 30 * 24 * 60 * 60;
 
 // Matches the daily schedule in wrangler.jsonc. Every other cron that fires
 // is the frequent mail.tm poll, which no-ops immediately in domain mode.
@@ -146,19 +143,19 @@ export default {
   },
 
   async scheduled(event: ScheduledEvent, env: Env): Promise<void> {
-    // The frequent trigger only exists for mail.tm mode. In domain mode
-    // this returns before touching D1 at all, so it costs a single env
-    // check per firing.
+    const db = createD1Executor(env.DB);
+
+    // Not gated on this Worker's own DISPOSABLE_DOMAIN: a mail.tm-backed
+    // address can exist in this same database even when this Worker is in
+    // domain mode, created by another adapter (e.g. the Telegram Worker)
+    // that's independently in mail.tm mode. pollOnce already no-ops cheaply
+    // when there's nothing mail.tm-backed to poll, so there's no benefit to
+    // skipping the call based on a setting that no longer tells you whether
+    // any row actually needs it.
     if (event.cron !== CLEANUP_CRON) {
-      if (usesOwnDomain(env)) {
-        return;
-      }
-      const db = createD1Executor(env.DB);
       await pollOnce(db, createDispatcher(buildAdapters(env)));
       return;
     }
-
-    const db = createD1Executor(env.DB);
 
     // Before the cleanup below, so an address can't be deleted in the same
     // run that was about to warn about it. Only reaches owners who opted in
@@ -166,15 +163,12 @@ export default {
     // cleanup from running.
     await sendExpiryWarnings(db, createDispatcher(buildAdapters(env)));
 
-    if (usesOwnDomain(env)) {
-      await deleteExpiredAndRevoked(db, CLEANUP_GRACE_SECONDS);
-      await deleteStaleRateLimits(db, STALE_RATE_LIMIT_SECONDS);
-      return;
-    }
-
-    // Deletes each mailbox on mail.tm's side before dropping its row, which
-    // plain deleteExpiredAndRevoked can't do, then runs that and
-    // deleteStaleRateLimits itself.
+    // Same reasoning as the poll above: runMailtmCleanup handles both kinds
+    // of row in one pass (it deletes each mailbox on mail.tm's side first
+    // for mail.tm-backed rows, which plain deleteExpiredAndRevoked can't
+    // do, then runs that and deleteStaleRateLimits regardless), so it's a
+    // strict superset of the domain-only path rather than an alternative
+    // to it.
     await runMailtmCleanup(db);
   },
 };
