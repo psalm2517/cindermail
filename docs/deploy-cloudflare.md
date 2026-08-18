@@ -63,7 +63,7 @@ npx wrangler secret put DISCORD_PUBLIC_KEY
 npx wrangler secret put DISCORD_APPLICATION_ID
 ```
 
-Skip `DISPOSABLE_DOMAIN` entirely for mail.tm mode. Where to find the Discord values: [discord-adapter.md](discord-adapter.md).
+Skip `DISPOSABLE_DOMAIN` entirely for mail.tm mode. Where to find the Discord values: [discord-adapter.md](discord-adapter.md). Want Telegram instead of (or alongside) Discord? Its secrets are separate, see [telegram-adapter.md](telegram-adapter.md).
 
 Secrets rather than `vars` because they stay out of the repo and survive deploys. Plaintext dashboard variables get overwritten by whatever `wrangler.jsonc` declares.
 
@@ -89,7 +89,7 @@ npm run cf:deploy
 
 ## 6. Set up delivery
 
-Mail is stored now but goes nowhere until the Discord adapter is set up: [discord-adapter.md](discord-adapter.md). Your Interactions Endpoint URL is the Worker's URL plus `/interactions`.
+Mail is stored now but goes nowhere until at least one delivery platform is set up: [discord-adapter.md](discord-adapter.md) (Interactions Endpoint URL is the Worker's URL plus `/interactions`) and/or [telegram-adapter.md](telegram-adapter.md) (webhook URL is the Worker's URL plus `/telegram-webhook`). Both can run at once, or just one.
 
 ## mail.tm mode
 
