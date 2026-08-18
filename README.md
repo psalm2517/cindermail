@@ -56,7 +56,7 @@ The wizard asks the same questions and writes the same config. Use this if you'l
 | `/remind [enabled]` | Opt in to a DM a day before an address expires. |
 | `/torch <address>` | Kill it. |
 
-Replies are ephemeral, visible only to whoever ran the command. Details in [docs/discord-adapter.md](docs/discord-adapter.md).
+Same commands work on Telegram, delivered as messages instead of DMs. Discord replies are ephemeral, visible only to whoever ran the command. Details in [docs/discord-adapter.md](docs/discord-adapter.md) and [docs/telegram-adapter.md](docs/telegram-adapter.md).
 
 ## How it works
 
@@ -80,7 +80,6 @@ Code layout and tests: [docs/architecture.md](docs/architecture.md). Every setti
 
 ## Under consideration (contingent on demand)
 
-- Telegram delivery adapter
 - Slack delivery adapter
 - Publicly hosted instance
 

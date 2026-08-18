@@ -1,6 +1,7 @@
 import { verifyKey } from "discord-interactions";
 import { createDiscordAdapter } from "./adapters/discord/index.ts";
 import { createTelegramAdapter } from "./adapters/telegram/index.ts";
+import { handleTelegramWebhookRequest } from "./adapters/telegram/webhook.ts";
 import { buildCommandConfig } from "./core/config.ts";
 import { handleInteraction, type DiscordInteraction } from "./adapters/discord/interactions.ts";
 import { createAddress, getCounters } from "./core/db.ts";
@@ -35,10 +36,14 @@ export interface Env {
   DISCORD_TOKEN: string;
   DISCORD_PUBLIC_KEY: string;
   DISCORD_APPLICATION_ID: string;
-  // Only needed if ADAPTERS includes "telegram" -- this Worker never
-  // receives Telegram's webhook (src/telegram-worker.ts does), it just
-  // needs the token to deliver outbound mail/reminders to Telegram users.
+  // Only needed if ADAPTERS includes "telegram". Used both to deliver
+  // outbound mail/reminders to Telegram users, and (if you're pointing
+  // Telegram's webhook at this Worker rather than a separate one -- see
+  // docs/telegram-adapter.md) to reply to commands.
   TELEGRAM_BOT_TOKEN?: string;
+  // Only needed if you're handling the Telegram webhook on this Worker.
+  // Unused if you deploy src/telegram-worker.ts separately instead.
+  TELEGRAM_WEBHOOK_SECRET?: string;
   // Optional overrides for core/config.ts defaults, see
   // docs/configuration.md for the full list of accepted vars.
   [key: string]: unknown;
@@ -70,6 +75,10 @@ export default {
 
     if (request.method === "GET" && url.pathname === "/") {
       return new Response(renderCounterPage(pkg.version), { headers: { "Content-Type": "text/html; charset=utf-8" } });
+    }
+
+    if (request.method === "POST" && url.pathname === "/telegram-webhook") {
+      return handleTelegramWebhookRequest(request, env, createD1Executor(env.DB));
     }
 
     if (request.method === "GET" && url.pathname === "/counters") {

@@ -1,9 +1,10 @@
 {
-  // A separate Worker from wrangler.jsonc's cinderbox, deployed independently
-  // with `wrangler deploy --config wrangler.telegram.jsonc`. Owns only the
-  // Telegram webhook -- see src/telegram-worker.ts for why this isn't folded
-  // into the main Worker. Shares the same D1 database (same database_id
-  // below), so both Workers see the same address rows.
+  // Optional. The main Worker (wrangler.jsonc's cinderbox) already handles
+  // Telegram's webhook on its own -- see docs/telegram-adapter.md. Only use
+  // this if you're running both Discord and Telegram and specifically want
+  // them bundle-isolated from each other, deployed independently with
+  // `wrangler deploy --config wrangler.telegram.jsonc`. Shares the same D1
+  // database (same database_id below), so both Workers see the same rows.
   //
   // No "triggers" here on purpose: cron (cleanup + the mail.tm poll) stays
   // solely on cinderbox. Declaring crons here too would run the mail.tm

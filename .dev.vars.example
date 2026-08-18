@@ -17,11 +17,13 @@ DISCORD_TOKEN=
 DISCORD_PUBLIC_KEY=
 DISCORD_APPLICATION_ID=
 
-# Only needed if ADAPTERS includes "telegram". From @BotFather. This Worker
-# only uses it to deliver mail *to* Telegram; the webhook itself is a
-# separate Worker (src/telegram-worker.ts, wrangler.telegram.jsonc), which
-# needs this same token plus its own TELEGRAM_WEBHOOK_SECRET set there.
+# Only needed if ADAPTERS includes "telegram". TELEGRAM_BOT_TOKEN is from
+# @BotFather. TELEGRAM_WEBHOOK_SECRET is one you make up yourself (e.g.
+# `openssl rand -hex 32`) and also pass to Telegram's setWebhook call, so a
+# request can be confirmed as actually coming from Telegram. See
+# docs/telegram-adapter.md.
 TELEGRAM_BOT_TOKEN=
+TELEGRAM_WEBHOOK_SECRET=
 
 # Optional. Defaults to 5 if unset. See docs/configuration.md for everything
 # else that can be tuned this way.
