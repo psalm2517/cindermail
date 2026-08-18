@@ -183,6 +183,7 @@ async function setupCloudflare(mode: "domain" | "mailtm"): Promise<void> {
     console.log("  No DNS or Email Routing to set up, mail.tm handles receiving.");
   }
   console.log("  Full walkthrough: docs/deploy-cloudflare.md, then docs/discord-adapter.md");
+  console.log("  Want Telegram too (or instead)? docs/telegram-adapter.md, no wizard step for it yet.");
 }
 
 async function main(): Promise<void> {

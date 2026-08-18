@@ -16,7 +16,7 @@
 
 ---
 
-Give out `x7k2p9qzrm@yourdomain.com` instead of your real address. Mail sent to it gets parsed and delivered to your Discord DMs. Torch it when you're done.
+Give out `x7k2p9qzrm@yourdomain.com` instead of your real address. Mail sent to it gets parsed and delivered straight to you, on Discord or Telegram. Torch it when you're done.
 
 ![Example delivery](docs/images/example-dm.png)
 
@@ -28,7 +28,7 @@ No domain? Leave one setting blank and it uses mail.tm's instead.
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/psalm2517/cindermail)
 
-Forks the repo, creates the database, deploys the Worker, prompts for your domain and Discord credentials. Blank domain means mail.tm mode.
+Forks the repo, creates the database, deploys the Worker, prompts for your domain and Discord credentials (Discord is the platform the automated setup covers today; Telegram is a manual step, see [docs/telegram-adapter.md](docs/telegram-adapter.md)). Blank domain means mail.tm mode.
 
 It can't load the database schema or register the slash commands with Discord. Those are in [docs/deploy-cloudflare.md](docs/deploy-cloudflare.md) and [docs/discord-adapter.md](docs/discord-adapter.md).
 
@@ -53,17 +53,17 @@ The wizard asks the same questions and writes the same config. Use this if you'l
 | `/list` | Your addresses, with notes, expiry, and how many of your quota you're using. |
 | `/extend <address> [expiry]` | Change when one expires. `expiry: 0` makes it permanent. |
 | `/note <address> [note]` | Label one. Blank clears it. |
-| `/remind [enabled]` | Opt in to a DM a day before an address expires. |
+| `/remind [on/off]` | Opt in to a message a day before an address expires. |
 | `/torch <address>` | Kill it. |
 
-Same commands work on Telegram, delivered as messages instead of DMs. Discord replies are ephemeral, visible only to whoever ran the command. Details in [docs/discord-adapter.md](docs/discord-adapter.md) and [docs/telegram-adapter.md](docs/telegram-adapter.md).
+Same six commands on both Discord and Telegram; exact option syntax differs slightly per platform (Discord takes structured options, Telegram reads plain text after the command). Discord replies are ephemeral, visible only to whoever ran the command; Telegram only works in a private chat with the bot for the same reason. Details in [docs/discord-adapter.md](docs/discord-adapter.md) and [docs/telegram-adapter.md](docs/telegram-adapter.md).
 
 ## How it works
 
 1. `/new` mints a random address owned by whoever ran it.
 2. Give it out. Mail sent there comes back to you, not to wherever you used it.
 3. Mail arrives, the Worker looks up the owner. Unknown, expired or torched addresses are dropped: no bounce, nothing logged.
-4. Otherwise it's parsed (HTML to text, links intact, attachments forwarded) and DM'd to you.
+4. Otherwise it's parsed (HTML to text, links intact, attachments forwarded) and delivered to you.
 
 A daily cron deletes expired and torched addresses, clears stale rate-limit rows, and sends expiry reminders.
 
