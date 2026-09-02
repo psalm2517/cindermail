@@ -103,18 +103,24 @@ export function renderCounterPage(version: string): string {
     transition: color 0.3s;
   }
   .row .n.bump { color: #fff2e2; }
-  .github {
+  .links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+  }
+  .links a {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: 1.25rem;
     color: #a8785a;
     text-decoration: none;
     font-size: 0.8rem;
     transition: color 0.15s;
   }
-  .github:hover { color: #ffcaa1; }
-  .github svg { width: 0.9rem; height: 0.9rem; fill: currentColor; }
+  .links a:hover { color: #ffcaa1; }
+  .links a svg { width: 0.9rem; height: 0.9rem; fill: currentColor; }
   .version { margin-top: 0.5rem; font-size: 0.7rem; color: #5c4432; }
   .note { margin: 1rem auto 0; font-size: 0.75rem; color: #7a5b41; max-width: 320px; }
 </style>
@@ -131,10 +137,20 @@ export function renderCounterPage(version: string): string {
     <div class="row"><span class="label">Torched</span><span class="n" id="torched">-</span></div>
     <div class="row"><span class="label">Users with active addresses</span><span class="n" id="users">-</span></div>
   </div>
-  <a class="github" href="https://github.com/psalm2517/cindermail" target="_blank" rel="noopener">
-    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-    Source code
-  </a>
+  <div class="links">
+    <a href="https://github.com/psalm2517/cindermail" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      Source
+    </a>
+    <a href="https://x.com/Psalm2517" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.53 6.78 15.06 0h-1.31l-4.8 5.88L5.12 0H0l5.8 8.89L0 16h1.31l5.07-6.22L10.88 16H16L9.53 6.78Zm-1.8 2.2-.59-.87L1.9.94h2.02l3.76 5.53.59.87 4.9 7.2H11.1L7.73 8.98Z"/></svg>
+      X
+    </a>
+    <a href="https://bsky.app/profile/amandoti.bsky.social" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 6.5C7.2 4.9 5.1 1.9 3.1.5 1.2-.9.4-.1.1.4c-.4.6-.1 3.3.1 3.8.6 1.9 2.7 2.5 4.6 2.3-3 .4-5.6 1.6-2.1 5.5 3.7 4 5.1-.9 5.7-2.9.5 2 2.4 6.5 5.6 2.9 3.3-3.9.9-5.1-2.1-5.5 1.9.2 4-.4 4.6-2.3.2-.5.5-3.2.1-3.8-.3-.5-1.1-1.3-3-.1C10.9 1.9 8.8 4.9 8 6.5Z"/></svg>
+      Bluesky
+    </a>
+  </div>
   <div class="version">v${version}</div>
   <p class="note">Live status for private hosted instance.</p>
 </main>
