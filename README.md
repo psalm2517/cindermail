@@ -1,6 +1,7 @@
 <div align="center">
 
 # Cindermail 🔥
+[Private hosted instance stats](https://cindermail.vsvn.net)
 
 **Disposable email delivered where you already are.**
 
