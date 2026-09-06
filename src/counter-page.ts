@@ -7,7 +7,7 @@ export function renderCounterPage(version: string): string {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cindermail</title>
+<title>Cindermail Status</title>
 <style>
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
