@@ -2,6 +2,8 @@ import { verifyKey } from "discord-interactions";
 import { createDiscordAdapter } from "./adapters/discord/index.ts";
 import { createTelegramAdapter } from "./adapters/telegram/index.ts";
 import { handleTelegramWebhookRequest } from "./adapters/telegram/webhook.ts";
+import { createSlackAdapter } from "./adapters/slack/index.ts";
+import { handleSlackCommandRequest } from "./adapters/slack/webhook.ts";
 import { buildCommandConfig } from "./core/config.ts";
 import { handleInteraction, type DiscordInteraction } from "./adapters/discord/interactions.ts";
 import { createAddress, getCounters } from "./core/db.ts";
@@ -44,6 +46,11 @@ export interface Env {
   // Only needed if you're handling the Telegram webhook on this Worker.
   // Unused if you deploy src/telegram-worker.ts separately instead.
   TELEGRAM_WEBHOOK_SECRET?: string;
+  // Only needed if ADAPTERS includes "slack". Used both to deliver outbound
+  // mail/reminders to Slack users and to reply to slash commands.
+  SLACK_BOT_TOKEN?: string;
+  // Verifies incoming slash command requests are really from Slack.
+  SLACK_SIGNING_SECRET?: string;
   // Optional overrides for core/config.ts defaults, see
   // docs/configuration.md for the full list of accepted vars.
   [key: string]: unknown;
@@ -66,6 +73,9 @@ function buildAdapters(env: Env): MailAdapter[] {
   if (enabled.includes("telegram") && env.TELEGRAM_BOT_TOKEN) {
     adapters.push(createTelegramAdapter(env.TELEGRAM_BOT_TOKEN));
   }
+  if (enabled.includes("slack") && env.SLACK_BOT_TOKEN) {
+    adapters.push(createSlackAdapter(env.SLACK_BOT_TOKEN));
+  }
   return adapters;
 }
 
@@ -79,6 +89,10 @@ export default {
 
     if (request.method === "POST" && url.pathname === "/telegram-webhook") {
       return handleTelegramWebhookRequest(request, env, createD1Executor(env.DB));
+    }
+
+    if (request.method === "POST" && url.pathname === "/slack/commands") {
+      return handleSlackCommandRequest(request, env, createD1Executor(env.DB));
     }
 
     if (request.method === "GET" && url.pathname === "/counters") {

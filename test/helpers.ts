@@ -5,6 +5,7 @@ import type { SqlExecutor } from "../src/core/storage.ts";
 import type { OwnerRef } from "../src/core/types.ts";
 import type { DiscordInteraction } from "../src/adapters/discord/interactions.ts";
 import type { TelegramUpdate } from "../src/adapters/telegram/commands.ts";
+import type { SlackSlashCommandPayload } from "../src/adapters/slack/commands.ts";
 
 // Resolved against this file rather than the working directory, so the tests
 // pass no matter where they're invoked from.
@@ -67,6 +68,12 @@ export const telegramReplyText = (reply: { chatId: string; text: string } | null
 // out of.
 export const telegramReplyAddress = (reply: { chatId: string; text: string } | null): string =>
   (telegramReplyText(reply).match(/address: (\S+)/) ?? [])[1] ?? "";
+
+export const slackOwner = (id: string): OwnerRef => ({ type: "slack", id });
+
+export function slackPayload(userId: string, command: string, text: string = ""): SlackSlashCommandPayload {
+  return { command, text, user_id: userId };
+}
 
 export const migrationFile = (name: string) => readFileSync(repoFile(`migrations/${name}`), "utf8");
 export const schemaSql = () => readFileSync(repoFile("schema.sql"), "utf8");

@@ -31,7 +31,7 @@
   "workers_dev": true,
   "preview_urls": true,
   "vars": {
-    "ADAPTERS": "discord,telegram"
+    "ADAPTERS": "discord,telegram,slack"
   },
   "d1_databases": [
     {
