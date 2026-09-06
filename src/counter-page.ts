@@ -129,7 +129,7 @@ export function renderCounterPage(version: string): string {
 <div class="embers" id="embers"></div>
 <main>
   <div class="flame">🔥</div>
-  <h1>Cindermail</h1>
+  <h1>Cindermail Status</h1>
   <div class="panel">
     <div class="status" id="status"><span class="dot"></span><span id="statusText">Connecting…</span></div>
     <div class="row"><span class="label">Addresses created</span><span class="n" id="created">-</span></div>
