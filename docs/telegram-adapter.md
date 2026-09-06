@@ -15,13 +15,7 @@ Message [@BotFather](https://t.me/BotFather) on Telegram, `/newbot`, follow the 
 
 Not something Telegram gives you -- make one up yourself, any random string (`openssl rand -hex 32` works). Telegram echoes it back on every webhook call so a request can be confirmed as actually coming from Telegram, not just anyone who finds the URL.
 
-## 3. One Worker or two?
-
-Default to **one Worker** -- the same one already handling everything else. Add the Telegram route to it and you're done; nothing extra to deploy or keep in sync.
-
-The only reason to split Telegram onto its *own* Worker (`src/telegram-worker.ts` / `wrangler.telegram.jsonc`) is if you're running **both** Discord and Telegram and specifically want them bundle-isolated from each other -- so a Discord-only change can't bloat what Telegram's Worker ships, and vice versa. If you're running Telegram alone, or don't care about that isolation, skip the split entirely.
-
-### Single Worker (recommended default)
+## 3. Set your secrets
 
 ```bash
 npx wrangler secret put TELEGRAM_BOT_TOKEN
@@ -38,7 +32,10 @@ npx wrangler deploy
 
 Your webhook path is `/telegram-webhook` on that same Worker.
 
-### Split onto a second Worker (optional)
+<details>
+<summary>Running both Discord and Telegram and want them on separate Workers instead?</summary>
+
+Not needed for a normal setup — one Worker handling everything is the default for a reason, nothing extra to deploy or keep in sync. This only matters if you specifically want Discord and Telegram bundle-isolated from each other, so a Discord-only change can't bloat what Telegram's Worker ships, and vice versa.
 
 ```bash
 npx wrangler secret put TELEGRAM_BOT_TOKEN --config wrangler.telegram.jsonc
@@ -46,17 +43,17 @@ npx wrangler secret put TELEGRAM_WEBHOOK_SECRET --config wrangler.telegram.jsonc
 npx wrangler deploy --config wrangler.telegram.jsonc
 ```
 
-The dashboard works here too, same as the single-Worker path above, just make sure you're on the **second** Worker's page (it has its own name, separate from the main one) rather than adding these to the main Worker by mistake.
-
-If your main Worker is in domain mode, also set `DISPOSABLE_DOMAIN` on this one to match:
+If your main Worker is in domain mode, also set `DISPOSABLE_DOMAIN` on this one to match — Cloudflare doesn't share secrets between Workers, so this has to be kept in sync by hand:
 
 ```bash
 npx wrangler secret put DISPOSABLE_DOMAIN --config wrangler.telegram.jsonc
 ```
 
-Cloudflare doesn't share secrets between Workers, so this has to be kept in sync by hand. If you skip it, this Worker falls back to mail.tm mode regardless of what the main Worker does, since it has no way to know otherwise.
+Skip that and this Worker falls back to mail.tm mode regardless of what the main Worker does, since it has no way to know otherwise.
 
-Your webhook path is `/webhook` on this second Worker, and it needs `TELEGRAM_BOT_TOKEN` set on the **main** Worker too (not just this one), so it can deliver inbound mail to Telegram users -- that part always runs on whichever Worker owns Email Routing and the cron, regardless of which Worker handles the webhook itself.
+Webhook path is `/webhook` on this second Worker (not `/telegram-webhook`), and it needs `TELEGRAM_BOT_TOKEN` set on the **main** Worker too, so it can deliver inbound mail to Telegram users — that part always runs on whichever Worker owns Email Routing and the cron, regardless of which Worker handles the webhook itself.
+
+</details>
 
 ## 4. Point Telegram at your endpoint
 
