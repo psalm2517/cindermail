@@ -63,6 +63,14 @@ curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=<your-worker-url>/teleg
 
 (`/webhook` instead of `/telegram-webhook` if you split onto a second Worker.) A successful response looks like `{"ok":true,"result":true,"description":"Webhook was set"}`.
 
+`ok: true` here only means Telegram accepted the request, not that the secret you passed matches what's actually saved as `TELEGRAM_WEBHOOK_SECRET` on the Worker — those are two different systems (Telegram's and Cloudflare's), and nothing cross-checks them against each other at the moment you set either one. If they end up different, `setWebhook` still reports success, and the bot silently never replies to anything. Confirm they actually agree with each other:
+
+```bash
+curl "https://api.telegram.org/bot<TOKEN>/getWebhookInfo"
+```
+
+Check the response for `last_error_message`. If it says something like `Wrong response from the webhook: 401 Unauthorized`, the two secrets don't match — re-run step 3, then step 4 again, in that order, confirming each command's own output before moving to the next one rather than pasting both as one block. If `last_error_message` is absent entirely and `pending_update_count` is `0`, it's working.
+
 ## 5. Try it
 
 Message your bot `/new`. Group chats are refused: commands only work in a private chat with the bot, since Telegram has no way to send a reply that's visible only to the person who ran the command, the way a reply in a private chat already is for everyone else in it.
