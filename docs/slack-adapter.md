@@ -8,6 +8,8 @@ Mail gets delivered as a Slack DM to whoever owns the address. [deploy-cloudflar
 - A deployed Worker (the same one from `deploy-cloudflare.md`, or a fresh one if this is the only adapter you're running).
 - A Slack workspace you can create an app in.
 
+Every command below assumes your terminal's current directory is that cloned repo folder. `wrangler` reads `wrangler.jsonc` from wherever you run it, so a command run from anywhere else (your home folder, a different project) fails with `Required Worker name missing` rather than doing what it says — that specific error means "wrong folder," not a real problem with your setup.
+
 ## 1. Create the app from a manifest
 
 Go to [api.slack.com/apps](https://api.slack.com/apps) → **Create New App** → **From an app manifest** → pick your workspace.

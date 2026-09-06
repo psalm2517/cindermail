@@ -9,6 +9,8 @@ This is what actually gets mail delivered. [deploy-cloudflare.md](deploy-cloudfl
 
 If you deployed with the button, clone your fork now if you haven't. Registering slash commands is a script with no dashboard equivalent, so there's no way around having the repo locally.
 
+Every command below assumes your terminal's current directory is that cloned repo folder. `wrangler` reads `wrangler.jsonc` from wherever you run it, so a command run from anywhere else (your home folder, a different project) fails with `Required Worker name missing` rather than doing what it says — that specific error means "wrong folder," not a real problem with your setup.
+
 ## 1. Create a Discord application
 
 At [discord.com/developers/applications](https://discord.com/developers/applications), create an application and give it a bot user under the Bot tab.

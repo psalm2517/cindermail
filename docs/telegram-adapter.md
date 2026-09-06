@@ -7,6 +7,8 @@ Mail gets delivered as a Telegram message to whoever owns the address. [deploy-c
 - A cloned repo with `npm install` run in it.
 - A deployed Worker (the same one from `deploy-cloudflare.md`, or a fresh one if this is the only adapter you're running).
 
+Every command below assumes your terminal's current directory is that cloned repo folder. `wrangler` reads `wrangler.jsonc` from wherever you run it, so a command run from anywhere else (your home folder, a different project) fails with `Required Worker name missing` rather than doing what it says — that specific error means "wrong folder," not a real problem with your setup.
+
 ## 1. Create a bot
 
 Message [@BotFather](https://t.me/BotFather) on Telegram, `/newbot`, follow the prompts. You get back a **bot token**.

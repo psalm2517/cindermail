@@ -20,6 +20,8 @@ One Worker, one D1 database, two modes:
 - A Cloudflare account.
 - A domain in that account, **domain mode only**.
 
+Every command on this page assumes your terminal's current directory is the cloned repo folder (`cd Cindermail` after cloning, per step 1). `wrangler` reads `wrangler.jsonc` from wherever you run it, so a command run from anywhere else fails with something like `Required Worker name missing` rather than doing what the command name suggests — that error means "you're in the wrong folder," not a real config problem.
+
 `wrangler` comes from `npm install` below, so there's no global install to do. Every command here runs from the repo directory.
 
 ## 1. Clone and install
