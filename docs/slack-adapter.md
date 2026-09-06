@@ -1,11 +1,11 @@
 # Setting up the Slack adapter
 
-Same six commands as Discord and Telegram, delivered as a Slack DM. [deploy-cloudflare.md](deploy-cloudflare.md) only gets mail as far as received and stored, so finish that first.
+Mail gets delivered as a Slack DM to whoever owns the address. [deploy-cloudflare.md](deploy-cloudflare.md) only gets mail as far as received and stored, so finish that first.
 
 ## What you need
 
 - A cloned repo with `npm install` run in it.
-- A deployed Worker (the same one from `deploy-cloudflare.md`, or a fresh one if you're not also running Discord or Telegram).
+- A deployed Worker (the same one from `deploy-cloudflare.md`, or a fresh one if this is the only adapter you're running).
 - A Slack workspace you can create an app in.
 
 ## 1. Create the app from a manifest
@@ -132,15 +132,54 @@ Send that address a test email and it arrives the same way Discord and Telegram 
 
 ## Commands
 
+Every reply uses Slack's `ephemeral` response type: visible only to whoever ran the command, in a DM or any channel alike, so there's no restriction on where you run one from.
+
+| Command | What it does | Rate limit |
+|---|---|---|
+| `/cm-new [expiry] [note]` | Creates an address. Permanent unless `expiry` is given. | 1 per 30s |
+| `/cm-list` | Your addresses, notes, and expiry. | 15 per 60s |
+| `/cm-extend <address> [expiry]` | Changes when an address expires. | 15 per 60s |
+| `/cm-note <address> [note]` | Labels an address. Blank clears it. | 15 per 60s |
+| `/cm-torch <address>` | Revokes an address. | 15 per 60s |
+| `/cm-remind [on\|off]` | Expiry reminder DMs. Blank shows the current setting. | 15 per 60s |
+
+Plain text after the command, no structured options: for `/cm-new` and `/cm-note`, a leading number is read as `expiry`; everything else is the note. For `/cm-extend`, the address comes first and an optional trailing number is the new expiry:
+
 ```
-/cm-new [expiry] [note]
-/cm-list
-/cm-note <address> [note]
-/cm-extend <address> [expiry]
-/cm-torch <address>
-/cm-remind [on|off]
+/cm-new                           permanent, no note
+/cm-new 7                         expires in 7 days
+/cm-new 7 netflix signup          expires in 7 days, noted
+/cm-new netflix signup            permanent (no leading number), noted
+
+/cm-extend x@you.com              10 days from now
+/cm-extend x@you.com 5            5 days from now
+/cm-extend x@you.com 0            permanent
 ```
 
-Plain text after the command, same shape as Telegram's: for `/cm-new` and `/cm-note`, a leading number is read as `expiry`; everything else is the note. For `/cm-extend`, the address comes first and an optional trailing number is the new expiry. See [docs/discord-adapter.md](discord-adapter.md) for what each command actually does, rate limits, and expiry/note semantics — identical across all three platforms, just the command prefix differs.
+`expiry` is in **days** on both `/cm-new` and `/cm-extend`, `0` meaning permanent. One asymmetry: bare `/cm-new` is permanent, bare `/cm-extend` uses the 10 day default, since `/cm-extend` should do what its name says. `/cm-extend` also sets expiry relative to now rather than adding to what's left: an address with 8 days left extended by `5` has 5 days, not 13.
 
-Unlike Telegram, there's no restriction to a private chat: Slack's `ephemeral` response type keeps every reply visible only to whoever ran it, even in a busy channel, so there's nothing to refuse.
+Permanent addresses still count against your active-address limit, and show as `permanent` in `/cm-list` rather than a countdown. Cleanup skips them, so `/cm-torch` is what ends one.
+
+## Notes
+
+A random local part tells you nothing about what you used it for. A note is an optional label, up to 80 characters, shown in `/cm-list`, visible only to the address's owner:
+
+```
+/cm-new 0 netflix trial
+/cm-note x7k2p9qzrm@you.com bank alerts
+/cm-note x7k2p9qzrm@you.com              clears it
+```
+
+## Expiry reminders
+
+Off until asked for:
+
+```
+/cm-remind on      DM about a day before an address expires
+/cm-remind off     stop
+/cm-remind         current setting
+```
+
+One DM covering everything of yours expiring soon, with notes, so you can `/cm-extend` what you still need. It rides the daily cleanup cron, so it lands 24 to 48 hours ahead rather than exactly a day; an address living under about two days never gets one, since no run sees it with a day still left: `/cm-new 1` won't warn. `/cm-extend` re-arms the reminder against the new expiry.
+
+Defaults for all of the above are configurable, see [configuration.md](configuration.md).

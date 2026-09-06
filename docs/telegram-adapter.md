@@ -1,11 +1,11 @@
 # Setting up the Telegram adapter
 
-Same commands as Discord, delivered as Telegram messages instead of Discord DMs. [deploy-cloudflare.md](deploy-cloudflare.md) only gets mail as far as received and stored, so finish that first.
+Mail gets delivered as a Telegram message to whoever owns the address. [deploy-cloudflare.md](deploy-cloudflare.md) only gets mail as far as received and stored, so finish that first.
 
 ## What you need
 
 - A cloned repo with `npm install` run in it.
-- A deployed Worker (the same one from `deploy-cloudflare.md`, or a fresh one if you're not also running Discord).
+- A deployed Worker (the same one from `deploy-cloudflare.md`, or a fresh one if this is the only adapter you're running).
 
 ## 1. Create a bot
 
@@ -64,17 +64,58 @@ curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=<your-worker-url>/teleg
 
 ## 5. Try it
 
-Message your bot `/new`. Group chats are refused (commands only work in a private chat with the bot, so a reply can't be visible to anyone but the person who ran it -- Telegram has no equivalent to Discord's ephemeral replies).
+Message your bot `/new`. Group chats are refused: commands only work in a private chat with the bot, since Telegram has no way to send a reply that's visible only to the person who ran the command, the way a reply in a private chat already is for everyone else in it.
 
 ## Commands
 
+Plain text after the command, no structured options, everything is just typed as one string:
+
+| Command | What it does | Rate limit |
+|---|---|---|
+| `/new [expiry] [note]` | Creates an address. Permanent unless `expiry` is given. | 1 per 30s |
+| `/list` | Your addresses, notes, and expiry. | 15 per 60s |
+| `/extend <address> [expiry]` | Changes when an address expires. | 15 per 60s |
+| `/note <address> [note]` | Labels an address. Blank clears it. | 15 per 60s |
+| `/torch <address>` | Revokes an address. | 15 per 60s |
+| `/remind [on\|off]` | Expiry reminder messages. Blank shows the current setting. | 15 per 60s |
+
+For `/new` and `/note`, a leading number is read as `expiry`; everything else is the note. For `/extend`, the address comes first and an optional trailing number is the new expiry:
+
 ```
-/new [expiry] [note]
-/list
-/note <address> [note]
-/extend <address> [expiry]
-/torch <address>
-/remind [on|off]
+/new                              permanent, no note
+/new 7                            expires in 7 days
+/new 7 netflix signup             expires in 7 days, noted
+/new netflix signup               permanent (no leading number), noted
+
+/extend x@you.com                 10 days from now
+/extend x@you.com 5               5 days from now
+/extend x@you.com 0               permanent
 ```
 
-No structured options the way Discord's slash commands have -- just plain text after the command. For `/new` and `/note`, a leading number is read as `expiry`; everything else is the note. For `/extend`, the address comes first and an optional trailing number is the new expiry. See [docs/discord-adapter.md](discord-adapter.md) for what each command actually does, rate limits, and expiry/note semantics -- identical on both platforms.
+`expiry` is in **days** on both `/new` and `/extend`, `0` meaning permanent. One asymmetry: bare `/new` is permanent, bare `/extend` uses the 10 day default, since `/extend` should do what its name says. `/extend` also sets expiry relative to now rather than adding to what's left: an address with 8 days left extended by `5` has 5 days, not 13.
+
+Permanent addresses still count against your active-address limit, and show as `permanent` in `/list` rather than a countdown. Cleanup skips them, so `/torch` is what ends one.
+
+## Notes
+
+A random local part tells you nothing about what you used it for. A note is an optional label, up to 80 characters, shown in `/list`, visible only to the address's owner:
+
+```
+/new 0 netflix trial
+/note x7k2p9qzrm@you.com bank alerts
+/note x7k2p9qzrm@you.com              clears it
+```
+
+## Expiry reminders
+
+Off until asked for:
+
+```
+/remind on      message about a day before an address expires
+/remind off     stop
+/remind         current setting
+```
+
+One message covering everything of yours expiring soon, with notes, so you can `/extend` what you still need. It rides the daily cleanup cron, so it lands 24 to 48 hours ahead rather than exactly a day; an address living under about two days never gets one, since no run sees it with a day still left: `/new 1` won't warn. `/extend` re-arms the reminder against the new expiry.
+
+Defaults for all of the above are configurable, see [configuration.md](configuration.md).
