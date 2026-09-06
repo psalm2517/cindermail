@@ -1,7 +1,7 @@
 <div align="center">
 
 # Cindermail 🔥
-[Website](https://cindermail.vsvn.net) | [Docs](https://cindermail.vsvn.net/docs)
+[Website](https://cindermail.xyz) | [Docs](https://cindermail.xyz/docs)
 
 **Disposable email delivered where you already are.**
 
