@@ -13,11 +13,19 @@ If you deployed with the button, clone your fork now if you haven't. Registering
 
 At [discord.com/developers/applications](https://discord.com/developers/applications), create an application and give it a bot user under the Bot tab.
 
-Three values, from General Information and Bot:
+Two values on **General Information** — Application ID isn't secret, it's a public identifier; Public Key (Discord's own name for it) isn't either, it's only ever used to *verify* a signature, never to create one:
 
-- Bot token
-- Public key
-- Application ID
+![Discord's General Information page, with Application ID and Public Key both visible in plain text](images/discord-general-info.png)
+
+One value on the **Bot** tab, and this one actually is secret — Discord shows it exactly once, at creation or reset:
+
+![Discord's Bot page, with the Token field blurred and a "Reset Token" button next to it](images/discord-token.png)
+
+So, three values total:
+
+- Bot token (Bot tab)
+- Public key (General Information)
+- Application ID (General Information)
 
 ## 2. Give it those credentials
 
@@ -51,13 +59,25 @@ On General Information, set the Interactions Endpoint URL to your Worker's URL p
 https://<your-worker>.<your-subdomain>.workers.dev/interactions
 ```
 
+![The Interactions Endpoint URL field on Discord's General Information page, with the worker subdomain blurred and the path ending in /interactions](images/discord-interactions.png)
+
 Discord verifies it with a signed ping on save. A failure is almost always a `DISCORD_PUBLIC_KEY` that doesn't match the app's Verify Key, or a Worker that isn't deployed yet.
 
 ## 5. Try it
 
 Works installed to a server or to just your own account, both enabled by default. Install link is on the Installation tab.
 
-Run `/new`, send the address a test email, expect a DM within seconds.
+Run `/new`, Discord's own UI shows the structured options as you fill them in:
+
+![Discord's slash command autocomplete for /new, with expiry set to 10 and note set to "Discord Test"](images/discord-mint.png)
+
+The reply is ephemeral, visible only to you, wherever you ran it from:
+
+![A Discord message showing "used /new" followed by an ephemeral reply from the Cindermail app: "Your new disposable address: xovuqshztx@vsvn.net (Discord Test), Expires in 10 days.", with "Only you can see this" underneath](images/discord-reply.png)
+
+Send that address a test email and it arrives as a DM within seconds, regardless of where `/new` was run:
+
+![A Discord DM from the Cindermail app forwarding a received test email, with From, To, and Subject lines followed by the message body](images/discord-received.png)
 
 Mail always arrives as a DM even if you ran `/new` in a channel. Commands work anywhere the bot is; delivery only ever goes to the owner's DMs.
 
