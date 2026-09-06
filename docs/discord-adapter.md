@@ -9,17 +9,17 @@ This is what actually gets mail delivered. [deploy-cloudflare.md](deploy-cloudfl
 
 If you deployed with the button, clone your fork now if you haven't. Registering slash commands is a script with no dashboard equivalent, so there's no way around having the repo locally.
 
-Every command below assumes your terminal's current directory is that cloned repo folder. `wrangler` reads `wrangler.jsonc` from wherever you run it, so a command run from anywhere else (your home folder, a different project) fails with `Required Worker name missing` rather than doing what it says — that specific error means "wrong folder," not a real problem with your setup.
+Every command below assumes your terminal's current directory is that cloned repo folder. `wrangler` reads `wrangler.jsonc` from wherever you run it, so a command run from anywhere else (your home folder, a different project) fails with `Required Worker name missing` rather than doing what it says. That specific error means "wrong folder," not a real problem with your setup.
 
 ## 1. Create a Discord application
 
 At [discord.com/developers/applications](https://discord.com/developers/applications), create an application and give it a bot user under the Bot tab.
 
-Two values on **General Information** — Application ID isn't secret, it's a public identifier; Public Key (Discord's own name for it) isn't either, it's only ever used to *verify* a signature, never to create one:
+Two values on **General Information**. Application ID isn't secret, it's a public identifier; Public Key (Discord's own name for it) isn't either, it's only ever used to *verify* a signature, never to create one:
 
 ![Discord's General Information page, with Application ID and Public Key both visible in plain text](images/discord-general-info.png)
 
-One value on the **Bot** tab, and this one actually is secret — Discord shows it exactly once, at creation or reset:
+One value on the **Bot** tab, and this one actually is secret. Discord shows it exactly once, at creation or reset:
 
 ![Discord's Bot page, with the Token field blurred and a "Reset Token" button next to it](images/discord-token.png)
 
@@ -31,24 +31,28 @@ So, three values total:
 
 ## 2. Give it those credentials
 
+The token and application ID get typed once here and reused for step 3 below, so set them as shell variables first rather than retyping either later:
+
 ```bash
-npx wrangler secret put DISCORD_TOKEN
+TOKEN=<paste your bot token here>
+APP_ID=<paste your application ID here>
+echo "$TOKEN" | npx wrangler secret put DISCORD_TOKEN
 npx wrangler secret put DISCORD_PUBLIC_KEY
-npx wrangler secret put DISCORD_APPLICATION_ID
+echo "$APP_ID" | npx wrangler secret put DISCORD_APPLICATION_ID
 ```
 
-Each prompts for the value. Stored encrypted by Cloudflare, never written to a file here. `npm run setup` offers to run them for you.
+`DISCORD_PUBLIC_KEY` still prompts interactively since it's only needed here, not reused anywhere else on this page. Everything's stored encrypted by Cloudflare, never written to a file here. `npm run setup` offers to run them for you.
 
 No terminal handy? Same result from **Workers & Pages → your Worker → Settings → Variables and Secrets → Add** for each one, **Type** set to **Secret**. Don't use the **Type: Text** option there, that's a plaintext variable that gets silently wiped the next time this Worker is deployed, since only `ADAPTERS` is declared in `wrangler.jsonc` and a redeploy makes that file the source of truth for anything not a Secret.
 
-Skip this if the deploy button already collected them.
+Skip this if the deploy button already collected them, but if you skip it, also generate `$TOKEN` and `$APP_ID` yourself before step 3, since that step needs them too and won't have anything to reuse.
 
 ## 3. Register the slash commands
 
-This one reads them from your shell rather than from Cloudflare, since secrets there can't be read back:
+This one reads them from your shell rather than from Cloudflare, since secrets there can't be read back. Reuse `$TOKEN` and `$APP_ID` from step 2, same terminal session:
 
 ```bash
-DISCORD_TOKEN=... DISCORD_APPLICATION_ID=... npm run register-commands
+DISCORD_TOKEN=$TOKEN DISCORD_APPLICATION_ID=$APP_ID npm run register-commands
 ```
 
 Only needs re-running when a command's name or arguments change, not every deploy.

@@ -8,7 +8,7 @@ Mail gets delivered as a Slack DM to whoever owns the address. [deploy-cloudflar
 - A deployed Worker (the same one from `deploy-cloudflare.md`, or a fresh one if this is the only adapter you're running).
 - A Slack workspace you can create an app in.
 
-Every command below assumes your terminal's current directory is that cloned repo folder. `wrangler` reads `wrangler.jsonc` from wherever you run it, so a command run from anywhere else (your home folder, a different project) fails with `Required Worker name missing` rather than doing what it says — that specific error means "wrong folder," not a real problem with your setup.
+Every command below assumes your terminal's current directory is that cloned repo folder. `wrangler` reads `wrangler.jsonc` from wherever you run it, so a command run from anywhere else (your home folder, a different project) fails with `Required Worker name missing` rather than doing what it says. That specific error means "wrong folder," not a real problem with your setup.
 
 ## 1. Create the app from a manifest
 
@@ -16,7 +16,7 @@ Go to [api.slack.com/apps](https://api.slack.com/apps) → **Create New App** �
 
 ![Slack's "Create new app" dialog, with "From a manifest" selected as the starting point](images/slack-create-app.png)
 
-Paste this in (YAML tab), replacing `YOUR-WORKER-URL` (six occurrences) with your actual Worker URL first — one find-and-replace, not six manual edits:
+Paste this in (YAML tab), replacing `YOUR-WORKER-URL` (six occurrences) with your actual Worker URL first: one find-and-replace, not six manual edits:
 
 ```yaml
 display_information:
@@ -101,7 +101,7 @@ Left sidebar → **Basic Information** → **App Credentials** → **Signing Sec
 
 ![The App Credentials panel: App ID and Client ID are safe to leave visible, Client Secret and Signing Secret are masked, and the deprecated Verification Token is blocked out since unlike the other two it isn't masked by default](images/slack-signing-secret.png)
 
-App ID and Client ID aren't secret, they're public identifiers. Client Secret and Signing Secret are, and Slack masks both by default. The Verification Token below them is deprecated but still live and shown in plain text — worth blocking out of any screenshot you take of this page, same as the two secrets above it.
+App ID and Client ID aren't secret, they're public identifiers. Client Secret and Signing Secret are, and Slack masks both by default. The Verification Token below them is deprecated but still live and shown in plain text, worth blocking out of any screenshot you take of this page, same as the two secrets above it.
 
 ## 6. Set both as secrets on the Worker
 
@@ -110,7 +110,7 @@ npx wrangler secret put SLACK_BOT_TOKEN
 npx wrangler secret put SLACK_SIGNING_SECRET
 ```
 
-Or skip the terminal entirely: **Workers & Pages → your Worker → Settings → Variables and Secrets → Add**, **Type: Secret**, one entry per name above, paste the value, **Deploy**. Both paths write to the same encrypted store. Just make sure the **Type** dropdown says **Secret**, not **Text** — a **Text** variable is plaintext and gets silently wiped the next time this Worker is deployed, since only `ADAPTERS` is declared in `wrangler.jsonc` and a redeploy treats that file as the source of truth for anything not a proper Secret.
+Or skip the terminal entirely: **Workers & Pages → your Worker → Settings → Variables and Secrets → Add**, **Type: Secret**, one entry per name above, paste the value, **Deploy**. Both paths write to the same encrypted store. Just make sure the **Type** dropdown says **Secret**, not **Text**. A **Text** variable is plaintext and gets silently wiped the next time this Worker is deployed, since only `ADAPTERS` is declared in `wrangler.jsonc` and a redeploy treats that file as the source of truth for anything not a proper Secret.
 
 Add `"slack"` to `ADAPTERS` in `wrangler.jsonc`'s `vars` (comma-separated with whatever else is there: `"discord,telegram,slack"`), then redeploy:
 
@@ -118,7 +118,7 @@ Add `"slack"` to `ADAPTERS` in `wrangler.jsonc`'s `vars` (comma-separated with w
 npx wrangler deploy
 ```
 
-Your Request URL is `/slack/commands` on that same Worker — the same one for all six commands, since Slack sends the command name in the payload rather than needing a separate endpoint per command.
+Your Request URL is `/slack/commands` on that same Worker, the same one for all six commands, since Slack sends the command name in the payload rather than needing a separate endpoint per command.
 
 ## 7. Try it
 
@@ -130,7 +130,7 @@ A reply comes back visible only to you, regardless of whether you ran it in the 
 
 ![A Slack DM from the Cindermail app: "Your new disposable address: tnh87pazbw@vsvn.net (Slack Test), Expires in 10 days.", marked "Only visible to you"](images/slack-reply.png)
 
-Send that address a test email and it arrives the same way Discord and Telegram deliver it — From/To/Subject header, then the body:
+Send that address a test email and it arrives the same way Discord and Telegram deliver it: From/To/Subject header, then the body:
 
 ![A Slack DM from the Cindermail app forwarding a received test email, with From, To, and Subject lines followed by the message body](images/slack-received.png)
 

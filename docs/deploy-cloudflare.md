@@ -20,7 +20,7 @@ One Worker, one D1 database, two modes:
 - A Cloudflare account.
 - A domain in that account, **domain mode only**.
 
-Every command on this page assumes your terminal's current directory is the cloned repo folder (`cd Cindermail` after cloning, per step 1). `wrangler` reads `wrangler.jsonc` from wherever you run it, so a command run from anywhere else fails with something like `Required Worker name missing` rather than doing what the command name suggests — that error means "you're in the wrong folder," not a real config problem.
+Every command on this page assumes your terminal's current directory is the cloned repo folder (`cd Cindermail` after cloning, per step 1). `wrangler` reads `wrangler.jsonc` from wherever you run it, so a command run from anywhere else fails with something like `Required Worker name missing` rather than doing what the command name suggests. That error means "you're in the wrong folder," not a real config problem.
 
 `wrangler` comes from `npm install` below, so there's no global install to do. Every command here runs from the repo directory.
 
@@ -133,4 +133,4 @@ npx wrangler d1 execute cinderbox --remote --file=migrations/0007_add_expiry_rem
 
 `0003` permanent addresses, `0004`/`0005` status page totals, `0006` notes, `0007` expiry reminders. Re-run `npm run register-commands` after, so Discord picks up new command options.
 
-Same dashboard alternative as loading the initial schema: **D1 SQLite Database → your database → Console**, paste each migration file's contents in order, run it. `register-commands` has no dashboard equivalent either way — it's a script that talks to Discord's API directly, not a Cloudflare operation.
+Same dashboard alternative as loading the initial schema: **D1 SQLite Database → your database → Console**, paste each migration file's contents in order, run it. `register-commands` has no dashboard equivalent either way: it's a script that talks to Discord's API directly, not a Cloudflare operation.
