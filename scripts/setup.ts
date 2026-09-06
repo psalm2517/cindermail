@@ -79,6 +79,54 @@ async function putDiscordSecrets(): Promise<void> {
   }
 }
 
+// Only sets the two Cloudflare-side secrets, same as Discord's version.
+// Pointing Telegram's webhook at the deployed URL (docs/telegram-adapter.md
+// step 2's setWebhook call) needs a real deployed Worker URL, which doesn't
+// exist yet this early in the wizard, so that part stays manual either way.
+async function putTelegramSecrets(): Promise<void> {
+  console.log("\nTelegram credentials. TELEGRAM_BOT_TOKEN is from @BotFather;");
+  console.log("TELEGRAM_WEBHOOK_SECRET is one you make up yourself (e.g. `openssl");
+  console.log("rand -hex 32`). wrangler will prompt for each value. They're stored");
+  console.log("encrypted by Cloudflare, never written to a file in this repo.\n");
+
+  for (const name of ["TELEGRAM_BOT_TOKEN", "TELEGRAM_WEBHOOK_SECRET"]) {
+    try {
+      execFileSync("npx", ["wrangler", "secret", "put", name], { stdio: "inherit" });
+    } catch {
+      console.log(`\nCouldn't set ${name}. Run this yourself later:`);
+      console.log(`  npx wrangler secret put ${name}`);
+    }
+  }
+
+  console.log("\nAdd \"telegram\" to ADAPTERS in wrangler.jsonc's vars if it isn't");
+  console.log("already there, then finish the webhook step once deployed: see");
+  console.log("docs/telegram-adapter.md.");
+}
+
+// Same shape as the other two: sets the Cloudflare-side secrets, leaves the
+// platform's own app-creation step (which happens on Slack's own site, not
+// something this wizard can drive) to docs/slack-adapter.md.
+async function putSlackSecrets(): Promise<void> {
+  console.log("\nSlack credentials, from your Slack app at api.slack.com/apps.");
+  console.log("SLACK_BOT_TOKEN is the Bot User OAuth Token (xoxb-...) under OAuth");
+  console.log("& Permissions; SLACK_SIGNING_SECRET is under Basic Information >");
+  console.log("App Credentials. wrangler will prompt for each value. They're");
+  console.log("stored encrypted by Cloudflare, never written to a file in this repo.\n");
+
+  for (const name of ["SLACK_BOT_TOKEN", "SLACK_SIGNING_SECRET"]) {
+    try {
+      execFileSync("npx", ["wrangler", "secret", "put", name], { stdio: "inherit" });
+    } catch {
+      console.log(`\nCouldn't set ${name}. Run this yourself later:`);
+      console.log(`  npx wrangler secret put ${name}`);
+    }
+  }
+
+  console.log("\nAdd \"slack\" to ADAPTERS in wrangler.jsonc's vars if it isn't");
+  console.log("already there. You'll still need to create the Slack app itself");
+  console.log("first if you haven't: see docs/slack-adapter.md.");
+}
+
 async function askLimits(): Promise<Record<string, string>> {
   if (!(await confirm("\nCustomize limits (active addresses per owner, address expiry)?"))) {
     return {};
@@ -170,6 +218,14 @@ async function setupCloudflare(mode: "domain" | "mailtm"): Promise<void> {
     await putDiscordSecrets();
   }
 
+  if (await confirm("\nSet the Telegram secrets now?")) {
+    await putTelegramSecrets();
+  }
+
+  if (await confirm("\nSet the Slack secrets now?")) {
+    await putSlackSecrets();
+  }
+
   console.log("\nNext:");
   let step = 1;
   if (mode === "domain") {
@@ -182,9 +238,9 @@ async function setupCloudflare(mode: "domain" | "mailtm"): Promise<void> {
   } else {
     console.log("  No DNS or Email Routing to set up, mail.tm handles receiving.");
   }
-  console.log("  Full walkthrough: docs/deploy-cloudflare.md, then docs/discord-adapter.md");
-  console.log("  Want Telegram too (or instead)? docs/telegram-adapter.md, no wizard step for it yet.");
-  console.log("  Slack too (or instead)? docs/slack-adapter.md, same story, no wizard step yet.");
+  console.log("  Full walkthrough: docs/deploy-cloudflare.md, then whichever of");
+  console.log("  docs/discord-adapter.md, docs/telegram-adapter.md, or docs/slack-adapter.md");
+  console.log("  match what you just set up above.");
 }
 
 async function main(): Promise<void> {

@@ -29,7 +29,7 @@ No domain? Leave one setting blank and it uses mail.tm's instead.
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/psalm2517/cindermail)
 
-Forks the repo, creates the database, deploys the Worker, prompts for your domain and Discord credentials (Discord is the platform the automated setup covers today; Telegram and Slack are a manual step, see [docs/telegram-adapter.md](docs/telegram-adapter.md) and [docs/slack-adapter.md](docs/slack-adapter.md)). Blank domain means mail.tm mode.
+Forks the repo, creates the database, deploys the Worker, prompts for your domain and credentials for whichever platforms you fill in (Discord, Telegram, Slack, any combination, blank fields are skipped). Blank domain means mail.tm mode.
 
 It can't load the database schema or register the slash commands with Discord. Those are in [docs/deploy-cloudflare.md](docs/deploy-cloudflare.md) and [docs/discord-adapter.md](docs/discord-adapter.md).
 
@@ -42,7 +42,7 @@ cd Cindermail
 npm install && npm run setup
 ```
 
-The wizard asks the same questions and writes the same config. Use this if you'll be changing the code.
+The wizard asks the same questions and writes the same config, plus it offers to set Discord's, Telegram's, and Slack's credentials interactively, one at a time. Use this if you'll be changing the code.
 
 </details>
 
