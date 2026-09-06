@@ -28,6 +28,8 @@ npx wrangler secret put TELEGRAM_BOT_TOKEN
 npx wrangler secret put TELEGRAM_WEBHOOK_SECRET
 ```
 
+Or from the dashboard: **Workers & Pages → your Worker → Settings → Variables and Secrets → Add**, **Type: Secret**, one entry per name above. Not **Type: Text** — that's a plaintext variable that gets silently wiped on this Worker's next deploy, since only `ADAPTERS` is declared in `wrangler.jsonc` and a redeploy makes that file the source of truth for anything not a proper Secret.
+
 Add `"telegram"` to `ADAPTERS` in `wrangler.jsonc`'s `vars` (comma-separated if Discord's there too: `"discord,telegram"`), then redeploy:
 
 ```bash
@@ -43,6 +45,8 @@ npx wrangler secret put TELEGRAM_BOT_TOKEN --config wrangler.telegram.jsonc
 npx wrangler secret put TELEGRAM_WEBHOOK_SECRET --config wrangler.telegram.jsonc
 npx wrangler deploy --config wrangler.telegram.jsonc
 ```
+
+The dashboard works here too, same as the single-Worker path above, just make sure you're on the **second** Worker's page (it has its own name, separate from the main one) rather than adding these to the main Worker by mistake.
 
 If your main Worker is in domain mode, also set `DISPOSABLE_DOMAIN` on this one to match:
 

@@ -108,6 +108,8 @@ npx wrangler secret put SLACK_BOT_TOKEN
 npx wrangler secret put SLACK_SIGNING_SECRET
 ```
 
+Or skip the terminal entirely: **Workers & Pages → your Worker → Settings → Variables and Secrets → Add**, **Type: Secret**, one entry per name above, paste the value, **Deploy**. Both paths write to the same encrypted store. Just make sure the **Type** dropdown says **Secret**, not **Text** — a **Text** variable is plaintext and gets silently wiped the next time this Worker is deployed, since only `ADAPTERS` is declared in `wrangler.jsonc` and a redeploy treats that file as the source of truth for anything not a proper Secret.
+
 Add `"slack"` to `ADAPTERS` in `wrangler.jsonc`'s `vars` (comma-separated with whatever else is there: `"discord,telegram,slack"`), then redeploy:
 
 ```bash

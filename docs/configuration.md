@@ -1,8 +1,8 @@
 # Configuration reference
 
-Everything is read from the Worker's environment, so anything below works either as a secret (`wrangler secret put NAME`) or as a plain `vars` entry in `wrangler.jsonc`.
+Everything is read from the Worker's environment, so anything below works either as a secret or as a plain `vars` entry in `wrangler.jsonc`. Set a secret with `wrangler secret put NAME`, or without a terminal at all: **Workers & Pages → your Worker → Settings → Variables and Secrets → Add**, **Type: Secret**. Both write to the same encrypted store.
 
-Use secrets for anything specific to your deployment. `wrangler.jsonc` is committed, so values there ship to everyone who clones it, and plaintext dashboard variables get overwritten on the next deploy by whatever that file declares. Secrets stay out of the repo and survive deploys. Only `ADAPTERS` sits in `vars`, because it's the same everywhere.
+Use secrets for anything specific to your deployment. `wrangler.jsonc` is committed, so values there ship to everyone who clones it. Only `ADAPTERS` sits in `vars`, because it's the same everywhere. Everything else should be a Secret, not the dashboard's **Type: Text** option — a **Text** variable is plaintext and gets silently overwritten on the next deploy by whatever `wrangler.jsonc` declares, since that file is the source of truth for anything not a proper Secret. A Secret survives deploys; a Text variable doesn't.
 
 | Variable | Required | Default | What it does |
 |---|---|---|---|

@@ -29,6 +29,8 @@ npx wrangler secret put DISCORD_APPLICATION_ID
 
 Each prompts for the value. Stored encrypted by Cloudflare, never written to a file here. `npm run setup` offers to run them for you.
 
+No terminal handy? Same result from **Workers & Pages → your Worker → Settings → Variables and Secrets → Add** for each one, **Type** set to **Secret**. Don't use the **Type: Text** option there, that's a plaintext variable that gets silently wiped the next time this Worker is deployed, since only `ADAPTERS` is declared in `wrangler.jsonc` and a redeploy makes that file the source of truth for anything not a Secret.
+
 Skip this if the deploy button already collected them.
 
 ## 3. Register the slash commands

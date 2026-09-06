@@ -46,6 +46,8 @@ npm run cf:db:init
 
 Button users start here: you have a database already, but it's empty until you run that.
 
+No terminal? **Workers & Pages → D1 SQLite Database → your database → Console** tab also works: open `schema.sql` in this repo, copy its full contents, paste into the console, run it. Same effect as the command above, since both just execute that file's SQL against the database.
+
 <details>
 <summary>Why <code>wrangler.jsonc</code> is committed</summary>
 
@@ -56,6 +58,8 @@ It silently takes precedence over `wrangler.toml`, so creating one of those has 
 
 ## 3. Set your secrets
 
+From a terminal:
+
 ```bash
 npx wrangler secret put DISPOSABLE_DOMAIN
 npx wrangler secret put DISCORD_TOKEN
@@ -63,9 +67,13 @@ npx wrangler secret put DISCORD_PUBLIC_KEY
 npx wrangler secret put DISCORD_APPLICATION_ID
 ```
 
+Each prompts for the value, then uploads it, one at a time.
+
+Or from the dashboard, no terminal needed: **Workers & Pages → your Worker → Settings → Variables and Secrets → Add**. Set the **Type** dropdown to **Secret** (not **Text**), give it the name and value, **Deploy** to apply it. Both paths hit the same underlying store and produce an identical result; the dashboard's **Text** type is a different, plaintext kind of variable that behaves nothing like this (see the note below), so the dropdown matters.
+
 Skip `DISPOSABLE_DOMAIN` entirely for mail.tm mode. Where to find the Discord values: [discord-adapter.md](discord-adapter.md). Want Telegram and/or Slack instead of (or alongside) Discord? Their secrets are separate, see [telegram-adapter.md](telegram-adapter.md) and [slack-adapter.md](slack-adapter.md).
 
-Secrets rather than `vars` because they stay out of the repo and survive deploys. Plaintext dashboard variables get overwritten by whatever `wrangler.jsonc` declares.
+Secrets (either path above) rather than plaintext `vars` because they stay out of the repo and survive deploys. A **Text** variable added from the dashboard does not survive: it gets silently overwritten the next time the Worker is deployed by whatever `wrangler.jsonc` declares (only `ADAPTERS` is declared there, so anything else set as **Text** just vanishes on the next `wrangler deploy` or Workers Build). This is the single most common way people lose a setting they were sure they'd saved.
 
 ## 4. Point your domain at Email Routing
 
@@ -122,3 +130,5 @@ npx wrangler d1 execute cinderbox --remote --file=migrations/0007_add_expiry_rem
 ```
 
 `0003` permanent addresses, `0004`/`0005` status page totals, `0006` notes, `0007` expiry reminders. Re-run `npm run register-commands` after, so Discord picks up new command options.
+
+Same dashboard alternative as loading the initial schema: **D1 SQLite Database → your database → Console**, paste each migration file's contents in order, run it. `register-commands` has no dashboard equivalent either way — it's a script that talks to Discord's API directly, not a Cloudflare operation.
