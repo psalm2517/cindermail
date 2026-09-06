@@ -1,9 +1,8 @@
 <div align="center">
 
-# Cindermail 🔥
-[Website](https://cindermail.xyz) | [Docs](https://cindermail.xyz/docs)
+![Cindermail](docs/images/banner.png)
 
-**Disposable email delivered where you already are.**
+[Website](https://cindermail.xyz) | [Docs](https://cindermail.xyz/docs)
 
 [![Release](https://img.shields.io/github/v/release/psalm2517/cindermail)](https://github.com/psalm2517/cindermail/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
