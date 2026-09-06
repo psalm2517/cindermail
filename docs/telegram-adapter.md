@@ -13,6 +13,8 @@ Every command below assumes your terminal's current directory is that cloned rep
 
 Message [@BotFather](https://t.me/BotFather) on Telegram, `/newbot`, follow the prompts. You get back a **bot token**.
 
+![A Telegram chat with BotFather: /newbot, naming it Cindermail, username CindermailBot, ending with "Done! Congratulations on your new bot" and the HTTP API token blurred](images/telegram-create-bot.png)
+
 ## 2. Set it up
 
 Two values need to reach two different systems without a typo sneaking in: the bot token goes to Cloudflare *and* gets reused in a `curl` call to Telegram below, and the webhook secret you make up yourself has to end up identical on both the Worker and in that same `curl` call. Put both in shell variables once, at the top, and every command after this (including the ones further down this page) reuses them instead of retyping anything:
@@ -76,6 +78,12 @@ Webhook path is `/webhook` on this second Worker (not `/telegram-webhook`), and 
 ## 3. Try it
 
 Message your bot `/new`. Group chats are refused: commands only work in a private chat with the bot, since Telegram has no way to send a reply that's visible only to the person who ran the command, the way a reply in a private chat already is for everyone else in it.
+
+![A Telegram DM: "/new" sent, followed by the bot's reply "Your new disposable address: lr2ecymcxx@vsvn.net, Permanent, good until you torch it."](images/telegram-mint.png)
+
+Send that address a test email and it arrives as a message within seconds:
+
+![A Telegram DM from the bot forwarding a received test email, with From, To, and Subject lines followed by the message body](images/telegram-received.png)
 
 ## Commands
 
