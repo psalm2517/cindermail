@@ -11,18 +11,19 @@ Mail gets delivered as a Telegram message to whoever owns the address. [deploy-c
 
 Message [@BotFather](https://t.me/BotFather) on Telegram, `/newbot`, follow the prompts. You get back a **bot token**.
 
-## 2. Pick a webhook secret
+## 2. Set it up
 
-Not something Telegram gives you -- make one up yourself, any random string (`openssl rand -hex 32` works). Telegram echoes it back on every webhook call so a request can be confirmed as actually coming from Telegram, not just anyone who finds the URL.
-
-## 3. Set your secrets
+The webhook secret isn't something Telegram gives you — you make it up, and it has to end up identical in two separate places: saved as `TELEGRAM_WEBHOOK_SECRET` on the Worker, and passed to Telegram's `setWebhook` call. Generate it once, into a shell variable, and reuse that variable for both, so there's no copy-pasting the same string twice and no risk of the two ending up different:
 
 ```bash
+SECRET=$(openssl rand -hex 32)
 npx wrangler secret put TELEGRAM_BOT_TOKEN
-npx wrangler secret put TELEGRAM_WEBHOOK_SECRET
+echo "$SECRET" | npx wrangler secret put TELEGRAM_WEBHOOK_SECRET
 ```
 
-Or from the dashboard: **Workers & Pages → your Worker → Settings → Variables and Secrets → Add**, **Type: Secret**, one entry per name above. Not **Type: Text** — that's a plaintext variable that gets silently wiped on this Worker's next deploy, since only `ADAPTERS` is declared in `wrangler.jsonc` and a redeploy makes that file the source of truth for anything not a proper Secret.
+The first line prompts and waits for you to paste the bot token from step 1. Run these as one sequence in the same terminal session — `$SECRET` only exists for as long as that shell stays open, so if you close it before the next block, generate a new one and start over rather than guessing what the old value was.
+
+No terminal? Same result from the dashboard: **Workers & Pages → your Worker → Settings → Variables and Secrets → Add**, **Type: Secret**, for `TELEGRAM_BOT_TOKEN`. For `TELEGRAM_WEBHOOK_SECRET`, generate the random string yourself first (any long random string works, it just has to match what you give Telegram in the next step), then add it the same way. Either path, use **Type: Secret**, never **Type: Text** — a **Text** variable is plaintext and gets silently wiped on this Worker's next deploy, since only `ADAPTERS` is declared in `wrangler.jsonc` and a redeploy makes that file the source of truth for anything not a proper Secret.
 
 Add `"telegram"` to `ADAPTERS` in `wrangler.jsonc`'s `vars` (comma-separated if Discord's there too: `"discord,telegram"`), then redeploy:
 
@@ -30,7 +31,19 @@ Add `"telegram"` to `ADAPTERS` in `wrangler.jsonc`'s `vars` (comma-separated if 
 npx wrangler deploy
 ```
 
-Your webhook path is `/telegram-webhook` on that same Worker.
+Now point Telegram at the same Worker, reusing `$SECRET` from above rather than retyping it:
+
+```bash
+curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://<your-worker>.<your-subdomain>.workers.dev/telegram-webhook&secret_token=$SECRET"
+```
+
+A successful response looks like `{"ok":true,"result":true,"description":"Webhook was set"}` — but that only means Telegram accepted the request, not that the secret it now has actually matches what's saved on the Worker. If you used `$SECRET` for both commands above in the same shell session, it does. If you typed either one by hand, or ran them in separate sessions, verify before assuming it works:
+
+```bash
+curl "https://api.telegram.org/bot<TOKEN>/getWebhookInfo"
+```
+
+Check the response for `last_error_message`. `Wrong response from the webhook: 401 Unauthorized` means the two secrets don't match — generate a fresh `$SECRET` and redo both commands above in one sitting. No `last_error_message` and `pending_update_count: 0` means it's working.
 
 <details>
 <summary>Running both Discord and Telegram and want them on separate Workers instead?</summary>
@@ -38,8 +51,9 @@ Your webhook path is `/telegram-webhook` on that same Worker.
 Not needed for a normal setup — one Worker handling everything is the default for a reason, nothing extra to deploy or keep in sync. This only matters if you specifically want Discord and Telegram bundle-isolated from each other, so a Discord-only change can't bloat what Telegram's Worker ships, and vice versa.
 
 ```bash
+SECRET=$(openssl rand -hex 32)
 npx wrangler secret put TELEGRAM_BOT_TOKEN --config wrangler.telegram.jsonc
-npx wrangler secret put TELEGRAM_WEBHOOK_SECRET --config wrangler.telegram.jsonc
+echo "$SECRET" | npx wrangler secret put TELEGRAM_WEBHOOK_SECRET --config wrangler.telegram.jsonc
 npx wrangler deploy --config wrangler.telegram.jsonc
 ```
 
@@ -51,27 +65,11 @@ npx wrangler secret put DISPOSABLE_DOMAIN --config wrangler.telegram.jsonc
 
 Skip that and this Worker falls back to mail.tm mode regardless of what the main Worker does, since it has no way to know otherwise.
 
-Webhook path is `/webhook` on this second Worker (not `/telegram-webhook`), and it needs `TELEGRAM_BOT_TOKEN` set on the **main** Worker too, so it can deliver inbound mail to Telegram users — that part always runs on whichever Worker owns Email Routing and the cron, regardless of which Worker handles the webhook itself.
+Webhook path is `/webhook` on this second Worker (not `/telegram-webhook`), and it needs `TELEGRAM_BOT_TOKEN` set on the **main** Worker too, so it can deliver inbound mail to Telegram users — that part always runs on whichever Worker owns Email Routing and the cron, regardless of which Worker handles the webhook itself. Point `setWebhook` at this second Worker's own URL, still reusing the same `$SECRET`.
 
 </details>
 
-## 4. Point Telegram at your endpoint
-
-```bash
-curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=<your-worker-url>/telegram-webhook&secret_token=<your-webhook-secret>"
-```
-
-(`/webhook` instead of `/telegram-webhook` if you split onto a second Worker.) A successful response looks like `{"ok":true,"result":true,"description":"Webhook was set"}`.
-
-`ok: true` here only means Telegram accepted the request, not that the secret you passed matches what's actually saved as `TELEGRAM_WEBHOOK_SECRET` on the Worker — those are two different systems (Telegram's and Cloudflare's), and nothing cross-checks them against each other at the moment you set either one. If they end up different, `setWebhook` still reports success, and the bot silently never replies to anything. Confirm they actually agree with each other:
-
-```bash
-curl "https://api.telegram.org/bot<TOKEN>/getWebhookInfo"
-```
-
-Check the response for `last_error_message`. If it says something like `Wrong response from the webhook: 401 Unauthorized`, the two secrets don't match — re-run step 3, then step 4 again, in that order, confirming each command's own output before moving to the next one rather than pasting both as one block. If `last_error_message` is absent entirely and `pending_update_count` is `0`, it's working.
-
-## 5. Try it
+## 3. Try it
 
 Message your bot `/new`. Group chats are refused: commands only work in a private chat with the bot, since Telegram has no way to send a reply that's visible only to the person who ran the command, the way a reply in a private chat already is for everyone else in it.
 
