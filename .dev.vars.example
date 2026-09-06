@@ -25,6 +25,13 @@ DISCORD_APPLICATION_ID=
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_WEBHOOK_SECRET=
 
+# Only needed if ADAPTERS includes "slack". Both come from your Slack app at
+# api.slack.com/apps: SLACK_BOT_TOKEN is the Bot User OAuth Token (xoxb-...)
+# under OAuth & Permissions, SLACK_SIGNING_SECRET is under Basic Information
+# > App Credentials. See docs/slack-adapter.md.
+SLACK_BOT_TOKEN=
+SLACK_SIGNING_SECRET=
+
 # Optional. Defaults to 5 if unset. See docs/configuration.md for everything
 # else that can be tuned this way.
 MAX_ACTIVE_ADDRESSES=

@@ -184,6 +184,7 @@ async function setupCloudflare(mode: "domain" | "mailtm"): Promise<void> {
   }
   console.log("  Full walkthrough: docs/deploy-cloudflare.md, then docs/discord-adapter.md");
   console.log("  Want Telegram too (or instead)? docs/telegram-adapter.md, no wizard step for it yet.");
+  console.log("  Slack too (or instead)? docs/slack-adapter.md, same story, no wizard step yet.");
 }
 
 async function main(): Promise<void> {

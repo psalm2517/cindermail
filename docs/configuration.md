@@ -11,8 +11,10 @@ Use secrets for anything specific to your deployment. `wrangler.jsonc` is commit
 | `DISCORD_APPLICATION_ID` | if `ADAPTERS` includes `discord` | | Used by `register-commands.ts`. |
 | `TELEGRAM_BOT_TOKEN` | if `ADAPTERS` includes `telegram` | | Bot token, from @BotFather. |
 | `TELEGRAM_WEBHOOK_SECRET` | only if this Worker handles the Telegram webhook itself | | One you make up, not one Telegram gives you. Verifies a webhook call actually came from Telegram. Unused if you split Telegram onto its own Worker via `wrangler.telegram.jsonc` and it's set there instead. See [telegram-adapter.md](telegram-adapter.md). |
+| `SLACK_BOT_TOKEN` | if `ADAPTERS` includes `slack` | | Bot User OAuth Token (`xoxb-...`), from your Slack app's OAuth & Permissions page. |
+| `SLACK_SIGNING_SECRET` | if `ADAPTERS` includes `slack` | | Verifies that slash command requests actually came from Slack. From the app's Basic Information page. See [slack-adapter.md](slack-adapter.md). |
 | `DISPOSABLE_DOMAIN` | no | unset | Domain addresses are generated on. Unset means mail.tm mode: addresses on mail.tm's domain, no domain of your own needed. Set independently per Worker if you're running Telegram split onto its own Worker; Cloudflare doesn't share secrets between Workers. |
-| `ADAPTERS` | no | `discord` | Comma separated list of enabled delivery adapters: `discord`, `telegram`, or both. |
+| `ADAPTERS` | no | `discord` | Comma separated list of enabled delivery adapters: `discord`, `telegram`, `slack`, or any combination. |
 | `MAX_ACTIVE_ADDRESSES` | no | `5` | Addresses one owner can hold at once. |
 | `ADDRESS_TTL_SECONDS` | no | `864000` (10 days) | What a bare `/extend` uses. `/new` is permanent by default and ignores this unless given an explicit `expiry`. |
 | `RATE_LIMIT_<CMD>_WINDOW_SECONDS` | no | see below | Window length for a command's rate limit. `<CMD>` is `NEW`, `LIST`, `EXTEND`, `TORCH`, `NOTE` or `REMIND`. |

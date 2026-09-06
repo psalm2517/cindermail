@@ -17,7 +17,7 @@
 
 ---
 
-Give out `x7k2p9qzrm@yourdomain.com` instead of your real address. Mail sent to it gets parsed and delivered straight to you, on Discord or Telegram. Torch it when you're done.
+Give out `x7k2p9qzrm@yourdomain.com` instead of your real address. Mail sent to it gets parsed and delivered straight to you, on Discord, Telegram, or Slack. Torch it when you're done.
 
 ![Example delivery](docs/images/example-dm.png)
 
@@ -29,7 +29,7 @@ No domain? Leave one setting blank and it uses mail.tm's instead.
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/psalm2517/cindermail)
 
-Forks the repo, creates the database, deploys the Worker, prompts for your domain and Discord credentials (Discord is the platform the automated setup covers today; Telegram is a manual step, see [docs/telegram-adapter.md](docs/telegram-adapter.md)). Blank domain means mail.tm mode.
+Forks the repo, creates the database, deploys the Worker, prompts for your domain and Discord credentials (Discord is the platform the automated setup covers today; Telegram and Slack are a manual step, see [docs/telegram-adapter.md](docs/telegram-adapter.md) and [docs/slack-adapter.md](docs/slack-adapter.md)). Blank domain means mail.tm mode.
 
 It can't load the database schema or register the slash commands with Discord. Those are in [docs/deploy-cloudflare.md](docs/deploy-cloudflare.md) and [docs/discord-adapter.md](docs/discord-adapter.md).
 
@@ -57,7 +57,7 @@ The wizard asks the same questions and writes the same config. Use this if you'l
 | `/remind [on/off]` | Opt in to a message a day before an address expires. |
 | `/torch <address>` | Kill it. |
 
-Same six commands on both Discord and Telegram; exact option syntax differs slightly per platform (Discord takes structured options, Telegram reads plain text after the command). Discord replies are ephemeral, visible only to whoever ran the command; Telegram only works in a private chat with the bot for the same reason. Details in [docs/discord-adapter.md](docs/discord-adapter.md) and [docs/telegram-adapter.md](docs/telegram-adapter.md).
+Same six commands across Discord, Telegram, and Slack; exact syntax differs slightly per platform (Discord takes structured options, Telegram and Slack read plain text after the command, and Slack's are prefixed `/cm-` since Slack rejects bare generic command names). Discord and Slack replies are ephemeral, visible only to whoever ran the command; Telegram only works in a private chat with the bot for the same reason, since it has no ephemeral-reply equivalent. Details in [docs/discord-adapter.md](docs/discord-adapter.md), [docs/telegram-adapter.md](docs/telegram-adapter.md), and [docs/slack-adapter.md](docs/slack-adapter.md).
 
 ## How it works
 

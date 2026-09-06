@@ -1,14 +1,15 @@
 # Architecture
 
-One Cloudflare Worker by default. Email Routing (or mail.tm) receives, D1 stores, Discord and/or Telegram deliver.
+One Cloudflare Worker by default. Email Routing (or mail.tm) receives, D1 stores, Discord and/or Telegram and/or Slack deliver.
 
 ```
 src/worker.ts             The main entrypoint. fetch() serves Discord
                           interactions, the Telegram webhook (optional, see
-                          below), and the status page. email() takes inbound
-                          mail from Email Routing. scheduled() runs the
-                          mail.tm poll and the daily cleanup. Picks domain vs
-                          mail.tm mode from whether DISPOSABLE_DOMAIN is set.
+                          below), Slack slash commands, and the status page.
+                          email() takes inbound mail from Email Routing.
+                          scheduled() runs the mail.tm poll and the daily
+                          cleanup. Picks domain vs mail.tm mode from whether
+                          DISPOSABLE_DOMAIN is set.
 src/telegram-worker.ts    An optional second entrypoint, only relevant if
                           you're running Discord and Telegram together and
                           want them bundle-isolated from each other. See
@@ -24,8 +25,8 @@ src/core/                 Address CRUD, rate limiting, dispatch, MIME
 src/core/storage.ts       SqlExecutor: the run/first/all interface core runs
                           SQL against, so core has no D1 types in it.
 src/storage/d1.ts         The SqlExecutor implementation for D1.
-src/adapters/             Delivery adapters. discord/ and telegram/ both
-                          ship built in.
+src/adapters/             Delivery adapters. discord/, telegram/, and slack/
+                          all ship built in.
 src/receivers/mailtm/     mail.tm's API client, the poller, and its cleanup
                           (which deletes the remote mailbox before dropping
                           the row). Used for any mail.tm-backed address
@@ -59,6 +60,6 @@ Covers command semantics, mail rendering, counters, expiry reminders, and that `
 
 **Delivery adapter.** Implement `MailAdapter` in `src/core/types.ts`: a `name`, a `deliver(owner, mail)` for forwarded email, and a `notify(owner, message)` for plain messages from the bot itself (expiry reminders). Both return `{ success, error? }` and never throw. Register it in `buildAdapters()` in `src/worker.ts` -- this part always lives there, since that's the only Worker that ever processes inbound mail.
 
-If the platform also needs inbound commands (`/new`, `/list`, etc., not just outbound delivery), that's a separate piece: parse whatever shape that platform's messages arrive in, reuse the shared logic in `src/core/commands.ts` and `src/core/config.ts` rather than reimplementing expiry/note parsing, and call the same `core/db.ts` functions Discord and Telegram both use. Whether that handler needs its own Worker (like `src/telegram-worker.ts`) or can just add a route to `src/worker.ts`'s `fetch()` depends on whether you want it bundle-isolated from the other adapters -- see `src/adapters/telegram/webhook.ts` for the pattern of a handler shared between both options.
+If the platform also needs inbound commands (`/new`, `/list`, etc., not just outbound delivery), that's a separate piece: parse whatever shape that platform's messages arrive in, reuse the shared logic in `src/core/commands.ts` and `src/core/config.ts` rather than reimplementing expiry/note parsing, and call the same `core/db.ts` functions Discord, Telegram, and Slack all use. Whether that handler needs its own Worker (like `src/telegram-worker.ts`) or can just add a route to `src/worker.ts`'s `fetch()` depends on whether you want it bundle-isolated from the other adapters -- see `src/adapters/telegram/webhook.ts` or `src/adapters/slack/webhook.ts` for that pattern; Slack's is the simpler of the two, since it has no split-Worker option to account for.
 
 **Storage backend.** Implement `SqlExecutor` in `src/core/storage.ts`. Call `handleInboundEmail({ to, from, raw }, db, dispatcher)` from `core/email.ts` for each piece of mail. `raw` takes a `Buffer`, `ReadableStream`, or string, whatever `postal-mime` accepts.
