@@ -6,7 +6,7 @@
 **Disposable email delivered where you already are.**
 
 [![Release](https://img.shields.io/github/v/release/psalm2517/cindermail)](https://github.com/psalm2517/cindermail/releases)
-[![License: Unlicense](https://img.shields.io/badge/License-Unlicense-blue.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![CI](https://github.com/psalm2517/cindermail/actions/workflows/ci.yml/badge.svg)](https://github.com/psalm2517/cindermail/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-f38020.svg?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com)
@@ -90,7 +90,7 @@ This project was built with AI assistance, directed by me.
 
 ## License
 
-Unlicense. See [LICENSE](./LICENSE).
+MIT. See [LICENSE](./LICENSE).
 
 <div align="center">
 
