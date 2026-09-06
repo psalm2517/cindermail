@@ -31,7 +31,7 @@ No domain? Leave one setting blank and it uses mail.tm's instead.
 
 Forks the repo, creates the database, deploys the Worker, prompts for your domain and credentials for whichever platforms you fill in (Discord, Telegram, Slack, any combination, blank fields are skipped). Blank domain means mail.tm mode.
 
-It can't load the database schema or register the slash commands with Discord. Those are in [docs/deploy-cloudflare.md](docs/deploy-cloudflare.md) and [docs/discord-adapter.md](docs/discord-adapter.md).
+It can't load the database schema, and each platform has one manual step of its own after that: registering commands for Discord, pointing a webhook at the Worker for Telegram, creating the app itself for Slack. The database step is in [docs/deploy-cloudflare.md](docs/deploy-cloudflare.md); the rest is whichever of [docs/discord-adapter.md](docs/discord-adapter.md), [docs/telegram-adapter.md](docs/telegram-adapter.md), or [docs/slack-adapter.md](docs/slack-adapter.md) matches what you filled in above.
 
 <details>
 <summary>Prefer a local clone</summary>
