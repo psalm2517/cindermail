@@ -82,6 +82,8 @@ Code layout and tests: [docs/architecture.md](docs/architecture.md). Every setti
 
 - Publicly hosted instance
 
+- Hosting as a service
+  
 ## AI disclosure
 
 This project was built with AI assistance, directed by me.
