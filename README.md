@@ -20,6 +20,8 @@ Give out `x7k2p9qzrm@yourdomain.com` instead of your real address. Mail sent to 
 
 ![Example delivery](docs/images/example-dm.png)
 
+[![Watch the 21-second demo: /new, an email arriving as a DM, then /torch all](docs/images/brag-poster.jpg)](https://cindermail.xyz/cindermail-brag.mp4)
+
 Addresses sit on a domain you own, so nothing flags them as disposable the way public temp-mail domains get flagged. Runs on Cloudflare's free tier: Email Routing receives, D1 stores, one Worker does the rest. Nothing to keep alive.
 
 No domain? Leave one setting blank and it uses mail.tm's instead.
