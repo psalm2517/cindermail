@@ -4,12 +4,12 @@
 
 [Website](https://cindermail.xyz) | [Demo](https://cindermail.xyz/demo) | [Docs](https://cindermail.xyz/docs) | [Roadmap](https://cindermail.xyz/roadmap)
 
-[![Release](https://img.shields.io/github/v/release/amandoti-win/cindermail)](https://github.com/amandoti-win/cindermail/releases)
+[![Release](https://img.shields.io/github/v/release/Psalm2517/cindermail)](https://github.com/Psalm2517/cindermail/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![CI](https://github.com/amandoti-win/cindermail/actions/workflows/ci.yml/badge.svg)](https://github.com/amandoti-win/cindermail/actions/workflows/ci.yml)
+[![CI](https://github.com/Psalm2517/cindermail/actions/workflows/ci.yml/badge.svg)](https://github.com/Psalm2517/cindermail/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-f38020.svg?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com)
-[![Stars](https://img.shields.io/github/stars/amandoti-win/cindermail)](https://github.com/amandoti-win/cindermail/stargazers)
+[![Stars](https://img.shields.io/github/stars/Psalm2517/cindermail)](https://github.com/Psalm2517/cindermail/stargazers)
 
 
 </div>
@@ -28,7 +28,7 @@ No domain? Leave one setting blank and it uses mail.tm's instead.
 
 ## Deploy
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/amandoti-win/cindermail)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Psalm2517/cindermail)
 
 Forks the repo, creates the database, deploys the Worker, prompts for your domain and credentials for whichever platforms you fill in (Discord, Telegram, Slack, any combination, blank fields are skipped). Blank domain means mail.tm mode.
 
@@ -38,7 +38,7 @@ It can't load the database schema, and each platform has one manual step of its 
 <summary>Prefer a local clone</summary>
 
 ```bash
-git clone https://github.com/amandoti-win/cindermail.git
+git clone https://github.com/Psalm2517/cindermail.git
 cd Cindermail
 npm install && npm run setup
 ```
